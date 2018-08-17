@@ -1,0 +1,13 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/**/build
+/**/out
+/captures
+/local
+*.orig
+/projectFilesBackup*
+/reports
+/private_tools
