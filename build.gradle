@@ -1,0 +1,14 @@
+buildscript {
+    ext {
+        kotlin_version = '1.2.60'
+    }
+}
+
+subprojects {
+    tasks.withType(Test) {
+        testLogging {
+            showStandardStreams = true
+            events "PASSED", "FAILED"
+        }
+    }
+}
