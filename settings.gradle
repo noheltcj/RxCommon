@@ -17,6 +17,5 @@ pluginManagement {
 }
 rootProject.name = 'RxCommon'
 
-include 'common', 'jvm', 'js'
-include 'ios'
+include 'common', 'jvm', 'js', 'ios'
 
