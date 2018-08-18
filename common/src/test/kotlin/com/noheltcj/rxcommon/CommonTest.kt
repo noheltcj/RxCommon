@@ -7,6 +7,5 @@ class CommonTest {
   @Test
   fun randomTest() {
     assertEquals(1, 1)
-    println("ran")
   }
 }
