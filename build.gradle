@@ -1,7 +1,7 @@
 buildscript {
     ext {
         project_group_id = 'com.noheltcj'
-        project_version = '0.0.1'
+        project_version = '0.0.2'
         kotlin_version = '1.2.60'
         upload_artifacts = System.getenv("uploadArtifacts") == "true"
     }
@@ -12,6 +12,10 @@ buildscript {
 }
 
 subprojects {
+    repositories {
+        jcenter()
+    }
+
     tasks.withType(Test) {
         testLogging {
             showStandardStreams = true

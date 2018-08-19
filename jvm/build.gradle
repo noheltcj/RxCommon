@@ -2,10 +2,6 @@ plugins {
     id 'kotlin-platform-jvm' version '1.2.60'
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     expectedBy project(":common")
 
@@ -33,10 +29,6 @@ archivesBaseName = "rx-common-jvm"
 apply {
     plugin 'signing'
     plugin 'maven'
-}
-
-repositories {
-    jcenter()
 }
 
 task javadocJar(type: Jar) {
@@ -107,4 +99,3 @@ uploadArchives {
         }
     }
 }
-

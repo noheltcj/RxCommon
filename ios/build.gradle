@@ -9,27 +9,88 @@ buildscript {
     }
 }
 
-repositories {
-    mavenCentral()
-}
-
 apply plugin: 'konan'
 
 konanArtifacts {
-    library('RxCommon') {
-        noStdLib false
+    library('RxCommon', targets: ['iphone', 'iphone_sim', 'macbook', 'wasm32', 'linux', 'android_arm64', 'android_arm32']) {
         enableMultiplatform true
-    }
-
-    program('test') {
-        srcDir 'src/main/kotlin'
-        commonSourceSets 'main', 'test'
-
-        enableMultiplatform true
-        extraOpts '-tr'
     }
 }
 
 dependencies {
     expectedBy project(':common')
 }
+
+/*
+group = project_group_id
+version = project_version
+archivesBaseName = 'rx-common-ios'
+
+apply {
+    plugin 'signing'
+    plugin 'maven-publish'
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from project.files('src/main/kotlin')
+}
+
+task javadocJar(type: Jar) {
+    from project.files('src/main/kotlin')
+    classifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        RxCommon(MavenPublication) {
+            pom {
+                artifactId 'rx-common-ios'
+
+                artifact sourcesJar
+                artifact javadocJar
+
+                packaging = 'jar'
+
+                description = "A multiplatform ReactiveX partial implementation."
+                url = 'https://github.com/noheltcj/RxCommon'
+
+                scm {
+                    connection = 'scm:git:https://github.com/noheltcj/RxCommon'
+                    developerConnection = 'scm:git:https://github.com/noheltcj/RxCommon'
+                    url = 'https://github.com/noheltcj/RxCommon'
+                }
+
+                licenses {
+                    license {
+                        name = 'MIT'
+                        url = 'https://github.com/noheltcj/RxCommon/blob/master/LICENSE'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'noheltcj'
+                        name = 'Colton Nohelty'
+                        email = 'noheltycolton@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+            credentials {
+                username ossrhUsername
+                password ossrhPassword
+            }
+        }
+    }
+
+    signing {
+        sign publishing.publications
+    }
+}
+*/
