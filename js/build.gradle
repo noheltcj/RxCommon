@@ -2,14 +2,89 @@ plugins {
     id 'kotlin-platform-js' version '1.2.60'
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     expectedBy project(":common")
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-js"
 
     testCompile "org.jetbrains.kotlin:kotlin-test-js"
+}
+
+
+group = project_group_id
+version = project_version
+archivesBaseName = 'rx-common-js'
+
+apply {
+    plugin 'signing'
+    plugin 'maven'
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = "sources"
+    from sourceSets.main.allSource
+}
+
+signing {
+    if (upload_artifacts) {
+        sign configurations.archives
+    }
+}
+
+artifacts {
+    archives sourcesJar, javadocJar, jar
+}
+
+uploadArchives {
+    if (upload_artifacts) {
+        repositories {
+            mavenDeployer {
+                beforeDeployment {
+                    MavenDeployment deployment -> signing.signPom(deployment)
+                }
+
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                pom.project {
+                    name project.name
+                    packaging 'jar'
+
+                    description "A multiplatform ReactiveX partial implementation."
+                    url 'https://github.com/noheltcj/RxCommon'
+
+                    scm {
+                        connection 'scm:git:https://github.com/noheltcj/RxCommon'
+                        developerConnection 'scm:git:https://github.com/noheltcj/RxCommon'
+                        url 'https://github.com/noheltcj/RxCommon'
+                    }
+
+                    licenses {
+                        license {
+                            name 'MIT'
+                            url 'https://github.com/noheltcj/RxCommon/blob/master/LICENSE'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id 'noheltcj'
+                            name 'Colton Nohelty'
+                            email 'noheltycolton@gmail.com'
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

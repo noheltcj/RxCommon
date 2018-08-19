@@ -5,24 +5,15 @@ buildscript {
     }
 
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-native-gradle-plugin:${project.property('konan.plugin.version')}"
+        classpath "org.jetbrains.kotlin:kotlin-native-gradle-plugin:0.8"
     }
 }
 
 apply plugin: 'konan'
 
 konanArtifacts {
-    framework('RxCommon', targets: ['iphone_sim', 'iphone']) {
-        extraOpts '-module_name', ''
+    library('RxCommon', targets: ['iphone', 'iphone_sim', 'macbook', 'wasm32', 'linux', 'android_arm64', 'android_arm32']) {
         enableMultiplatform true
-    }
-
-    program('test') {
-        srcDir 'src/main/kotlin'
-        commonSourceSets 'main', 'test'
-
-        enableMultiplatform true
-        extraOpts '-tr'
     }
 }
 

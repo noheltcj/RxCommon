@@ -15,6 +15,9 @@ pluginManagement {
         }
     }
 }
+
+enableFeaturePreview('GRADLE_METADATA')
+
 rootProject.name = 'RxCommon'
 
 include 'common', 'jvm', 'js', 'ios'
