@@ -1,9 +1,10 @@
 package com.noheltcj.rxcommon
 
-abstract class Emitter<T> {
+interface Emitter<T> {
   /**
    * Will return true when the source was disposed
    */
-  var isDisposed = false
-    internal set
+  val isDisposed: Boolean
+
+  fun onDispose()
 }

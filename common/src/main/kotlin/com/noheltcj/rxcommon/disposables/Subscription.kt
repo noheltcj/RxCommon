@@ -1,12 +1,7 @@
 package com.noheltcj.rxcommon.disposables
 
-import com.noheltcj.rxcommon.Source
+import com.noheltcj.rxcommon.Emitter
 
-class Subscription<T>(
-    private val source: Source<T>,
-    inline val operation: (T) -> Unit) : Disposable {
-
-  override fun dispose() {
-    source.unsubscribe(this)
-  }
+interface Subscription<El> : Disposable {
+  val emitter: Em
 }

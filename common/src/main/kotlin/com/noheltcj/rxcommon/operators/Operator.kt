@@ -1,5 +1,8 @@
 package com.noheltcj.rxcommon
 
+import com.noheltcj.rxcommon.disposables.Disposable
+import com.noheltcj.rxcommon.disposables.Subscription
+
 sealed class Operator<E, U>(protected val upSource: Source<U>) : Source<E> {
   protected val activeSubscriptions = mutableListOf<Subscription<E>>()
   protected var upstreamDisposable: Disposable? = null
