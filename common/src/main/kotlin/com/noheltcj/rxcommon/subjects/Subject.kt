@@ -5,34 +5,25 @@ import com.noheltcj.rxcommon.disposables.Disposable
 import com.noheltcj.rxcommon.disposables.Subscription
 import com.noheltcj.rxcommon.observable.ObservableEmitter
 
-private typealias Emitter<E> = ObservableEmitter<E>
+class Subject<E> : Observer<E>, Source<E> {
+  abstract override val emitter : ObservableEmitter<E>
 
-abstract class Subject<E> : Source<E, Emitter<E>>, Observer<E, Emitter<E>> {
-  abstract val emitter : Emitter<E>
-
-  protected var disposable: Disposable? = null
-
-  override fun subscribeTo(source: Source<E, Emitter<E>>) {
-    source.subscribe(object : ObservableEmitter)
+  override fun subscribeTo(source: Source<E>) {
+    source.subscribe(this)
   }
 
-  override fun <O : Observer<E, Emitter<E>>> subscribe(observer: O): Subscription<E, Emitter<E>> {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+  override fun subscribe(observer: Observer<E>): Disposable {
+    return Subscription(observer).also {
+      emitter.addSubscription(it)
+    }
   }
 
   open fun publish(value: E) {
-    activeSubscriptions.forEach { it.emitter.onNext(value) }
+    emitter.onNext(value)
   }
 
-//  override fun subscribe(observer: Observer<E>) : Subscription<E> {
-//    return ObservableSubscription(this)
-//        .also {
-//          activeSubscriptions.add(it)
-//        }
-//  }
-
-  override fun unsubscribe(subscription: Subscription<E, ObservableEmitter<E>>) {
-    activeSubscriptions.remove(subscription)
+  override fun unsubscribe(observer: Observer<E>) {
+    emitter.removeObserver(observer)
   }
 
 //  override fun <T> map(transformation: (E) -> T): Source<T> {

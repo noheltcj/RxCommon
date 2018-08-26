@@ -1,21 +1,42 @@
 package com.noheltcj.rxcommon.observable
 
 import com.noheltcj.rxcommon.Emitter
-import com.noheltcj.rxcommon.Source
-import com.noheltcj.rxcommon.disposables.Subscription
+import com.noheltcj.rxcommon.Observer
 
-class ObservableEmitter<El, Em : Emitter<El>>(val source: Source<El, Em>) : Emitter<El> {
-  protected val activeSubscriptions = mutableListOf<Subscription<El>>()
+class ObservableEmitter<E> : Emitter<E> {
+  private val activeObservers = mutableListOf<Observer<E>>()
 
   override var isDisposed = false
     private set
+  override var isCompleted = false
+    private set
+  override var isTerminated = false
+    private set
 
-  override fun onDispose() {
-    isDisposed = true
-    source.unsubscribe()
+  override fun addObserver(observer: Observer<E>) {
+    activeObservers.add(observer)
   }
 
-  fun onNext(value: E)
-  fun onError(throwable: Throwable)
-  fun onComplete()
+  override fun removeObserver(observer: Observer<E>) {
+    activeObservers.remove(observer)
+  }
+
+  override fun next(value: E) {
+    activeObservers.forEach { it.onNext(value) }
+  }
+
+  override fun terminate(throwable: Throwable) {
+    isTerminated = true
+    activeObservers.forEach { it.onError(throwable) }
+  }
+
+  override fun complete() {
+    isCompleted = true
+    activeObservers.forEach { it.onComplete() }
+  }
+
+  override fun dispose(observer: Observer<E>) {
+    isDisposed = true
+    activeObservers.first { it == observer }.onDispose()
+  }
 }

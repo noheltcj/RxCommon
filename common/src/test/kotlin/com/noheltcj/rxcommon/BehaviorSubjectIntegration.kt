@@ -1,20 +1,20 @@
 package com.noheltcj.rxcommon
 
+import com.noheltcj.rxcommon.observable.ObservableObserver
 import com.noheltcj.rxcommon.subjects.BehaviorSubject
-import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class BehaviorSubjectIntegration {
-  lateinit var testObserver: TestObserver<String>()
+//  lateinit var testObserver: TestObserver<String>()
 
   // --- No upstream -- START
   @Test
   fun `subscribe - should emit the seed`() {
     var emission: String? = null
-    BehaviorSubject("seed").subscribe {
-      emission = it
-    }
+    BehaviorSubject("seed").subscribe(ObservableObserver(
+        onNext = { emission = it }
+    ))
     assertEquals("seed", emission)
   }
 
@@ -22,9 +22,9 @@ class BehaviorSubjectIntegration {
   fun `subscribe - when a new value published, should emit new value`() {
     var emission: String? = null
     BehaviorSubject("1").apply {
-      subscribe {
-        emission = it
-      }
+      subscribe(ObservableObserver(
+          onNext = { emission = it }
+      ))
       publish("2")
     }
     assertEquals("2", emission)
@@ -36,11 +36,11 @@ class BehaviorSubjectIntegration {
 
   @Test
   fun `given upstream has not emitted, should emit the seed`() {
-    var emission: MockEmission? = null
+    var emission: String? = null
     BehaviorSubject("seed").apply {
-      subscribe {
-        emission = it
-      }
+      subscribe(ObservableObserver(
+          onNext = { emission = it }
+      ))
     }
     assertEquals("seed", emission)
   }
@@ -49,9 +49,7 @@ class BehaviorSubjectIntegration {
   fun `given upstream has emitted, when subscribe, should emit latest value from upstream`() {
     var emission: String? = null
     BehaviorSubject("1").apply {
-      subscribe {
-        emission = it
-      }
+      subscribeTo(BehaviorSubject("2"))
     }
     assertEquals("2", emission)
   }
