@@ -1,6 +1,6 @@
 package com.noheltcj.rxcommon.utility
 
-import com.noheltcj.rxcommon.Observer
+import com.noheltcj.rxcommon.observers.Observer
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
@@ -33,5 +33,4 @@ class TestObserver<E> : Observer<E> {
   override fun onDispose() {
     disposed = true
   }
-
 }
