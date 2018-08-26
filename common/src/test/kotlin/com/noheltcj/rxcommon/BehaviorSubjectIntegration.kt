@@ -1,56 +1,44 @@
 package com.noheltcj.rxcommon
 
-import com.noheltcj.rxcommon.observable.ObservableObserver
 import com.noheltcj.rxcommon.subjects.BehaviorSubject
+import com.noheltcj.rxcommon.utility.TestObserver
+import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 class BehaviorSubjectIntegration {
-//  lateinit var testObserver: TestObserver<String>()
+  lateinit var testObserver: TestObserver<String>
 
-  // --- No upstream -- START
-  @Test
-  fun `subscribe - should emit the seed`() {
-    var emission: String? = null
-    BehaviorSubject("seed").subscribe(ObservableObserver(
-        onNext = { emission = it }
-    ))
-    assertEquals("seed", emission)
+  @BeforeTest
+  fun setup() {
+    testObserver = TestObserver()
   }
 
   @Test
-  fun `subscribe - when a new value published, should emit new value`() {
-    var emission: String? = null
+  fun `when subscribing, should emit the seed`() {
+    BehaviorSubject("seed").subscribe(testObserver)
+    testObserver.assertValue("seed")
+  }
+
+  @Test
+  fun `given subscribed, when a new value published, should emit new value`() {
     BehaviorSubject("1").apply {
-      subscribe(ObservableObserver(
-          onNext = { emission = it }
-      ))
+      subscribe(testObserver)
       publish("2")
     }
-    assertEquals("2", emission)
-  }
-
-  // --- No upstream -- END
-
-  // --- Has upstream observable -- START
-
-  @Test
-  fun `given upstream has not emitted, should emit the seed`() {
-    var emission: String? = null
-    BehaviorSubject("seed").apply {
-      subscribe(ObservableObserver(
-          onNext = { emission = it }
-      ))
-    }
-    assertEquals("seed", emission)
+    testObserver.assertValue("2")
   }
 
   @Test
-  fun `given upstream has emitted, when subscribe, should emit latest value from upstream`() {
-    var emission: String? = null
+  fun `given upstream has not emitted, when subscribing, should emit the seed`() {
+    // TODO: Implement this test when Observable exists
+  }
+
+  @Test
+  fun `given upstream has emitted, when subscribing, should emit latest value from upstream`() {
     BehaviorSubject("1").apply {
       subscribeTo(BehaviorSubject("2"))
+      subscribe(testObserver)
     }
-    assertEquals("2", emission)
+    testObserver.assertValue("2")
   }
 }

@@ -1,27 +1,5 @@
 package com.noheltcj.rxcommon.observers
 
-import com.noheltcj.rxcommon.Observer
-import com.noheltcj.rxcommon.Source
+import com.noheltcj.rxcommon.observable.AbstractObserver
 
-class NextObserver<E>(private val next: (E) -> Unit) : Observer<E> {
-  override fun subscribeTo(source: Source<E>) {
-
-  }
-
-  override fun onNext(value: E) {
-    next(value)
-  }
-
-  override fun onError(throwable: Throwable) {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
-
-  override fun onComplete() {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
-
-  override fun onDispose() {
-    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-  }
-
-}
+class NextObserver<E>(next: (E) -> Unit) : AbstractObserver<E>(next = next)

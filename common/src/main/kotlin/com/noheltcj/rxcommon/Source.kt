@@ -14,7 +14,9 @@ interface Source<E> {
     }
   }
 
-  fun unsubscribe(observer: Observer<E>)
+  fun unsubscribe(observer: Observer<E>) {
+    emitter.removeObserver(observer)
+  }
 
 //  fun <T> map(transformation: (E) -> T) : Source<T, >
 //  fun <T, O> combine(otherSource: Source<O>,

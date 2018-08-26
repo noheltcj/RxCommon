@@ -1,6 +1,7 @@
 package com.noheltcj.rxcommon.subjects
 
-import com.noheltcj.rxcommon.disposables.Disposable
+import com.noheltcj.rxcommon.observable.ObservableEmitter
 
-//class PublishSubject<E>() : Subject<E>() {
-//}
+class PublishSubject<E> : Subject<E>() {
+  override val emitter = ObservableEmitter<E>()
+}
