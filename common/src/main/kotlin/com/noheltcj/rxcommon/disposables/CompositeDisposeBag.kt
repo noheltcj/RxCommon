@@ -1,6 +1,4 @@
-package com.noheltcj.rxcommon
-
-import com.noheltcj.rxcommon.disposables.Disposable
+package com.noheltcj.rxcommon.disposables
 
 class CompositeDisposeBag : Disposable {
   private val disposables = mutableListOf<Disposable>()

@@ -1,8 +1,8 @@
 package com.noheltcj.rxcommon.subjects
 
-import com.noheltcj.rxcommon.*
-import com.noheltcj.rxcommon.observable.AbstractObserver
-import com.noheltcj.rxcommon.observable.ObservableEmitter
+import com.noheltcj.rxcommon.Source
+import com.noheltcj.rxcommon.emitters.ObservableEmitter
+import com.noheltcj.rxcommon.observers.AbstractObserver
 
 abstract class Subject<E> : AbstractObserver<E>(), Source<E> {
   abstract override val emitter : ObservableEmitter<E>

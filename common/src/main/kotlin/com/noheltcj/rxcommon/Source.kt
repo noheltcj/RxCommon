@@ -2,6 +2,7 @@ package com.noheltcj.rxcommon
 
 import com.noheltcj.rxcommon.disposables.Disposable
 import com.noheltcj.rxcommon.disposables.Disposables
+import com.noheltcj.rxcommon.observers.Observer
 
 interface Source<E> {
   val emitter: Emitter<E>

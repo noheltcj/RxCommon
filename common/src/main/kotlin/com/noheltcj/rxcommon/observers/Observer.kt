@@ -1,4 +1,4 @@
-package com.noheltcj.rxcommon
+package com.noheltcj.rxcommon.observers
 
 interface Observer<E> {
   fun onNext(value: E)

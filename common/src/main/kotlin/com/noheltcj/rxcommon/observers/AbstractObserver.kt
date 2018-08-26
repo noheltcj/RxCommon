@@ -1,6 +1,4 @@
-package com.noheltcj.rxcommon.observable
-
-import com.noheltcj.rxcommon.Observer
+package com.noheltcj.rxcommon.observers
 
 abstract class AbstractObserver<E>(val next: (E) -> Unit = {},
                                    val error: (Throwable) -> Unit = {},

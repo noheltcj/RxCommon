@@ -1,7 +1,6 @@
-package com.noheltcj.rxcommon.observable
+package com.noheltcj.rxcommon.emitters
 
-import com.noheltcj.rxcommon.Emitter
-import com.noheltcj.rxcommon.Observer
+import com.noheltcj.rxcommon.observers.Observer
 
 class ObservableEmitter<E> : Emitter<E> {
   private val activeObservers = mutableListOf<Observer<E>>()

@@ -1,4 +1,6 @@
-package com.noheltcj.rxcommon
+package com.noheltcj.rxcommon.emitters
+
+import com.noheltcj.rxcommon.observers.Observer
 
 interface Emitter<E> {
   val isDisposed: Boolean

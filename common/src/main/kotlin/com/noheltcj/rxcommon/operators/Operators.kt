@@ -1,4 +1,4 @@
-package com.noheltcj.rxcommon
+package com.noheltcj.rxcommon.operators
 
 /* TODO: Implement operator extensions
 fun <S1, S2, R> Source<S1>.combineLatest(otherSource: Source<S2>, transform: (S1, S2) -> R): Source<R> =

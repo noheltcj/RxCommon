@@ -1,8 +1,8 @@
 package com.noheltcj.rxcommon.subjects
 
-import com.noheltcj.rxcommon.Observer
 import com.noheltcj.rxcommon.disposables.Disposable
-import com.noheltcj.rxcommon.observable.ObservableEmitter
+import com.noheltcj.rxcommon.emitters.ObservableEmitter
+import com.noheltcj.rxcommon.observers.Observer
 
 /**
  * See <a href="http://www.introtorx.com/Content/v1.0.10621.0/02_KeyTypes.html#BehaviorSubject" />
