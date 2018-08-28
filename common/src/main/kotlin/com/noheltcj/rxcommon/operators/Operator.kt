@@ -1,6 +1,9 @@
-package com.noheltcj.rxcommon
+package com.noheltcj.rxcommon.operators
 
-sealed class Transformation<E, U>(protected val upChannel: Channel<U>) : Channel<E> {
+import com.noheltcj.rxcommon.disposables.Disposable
+
+/* TODO: Re-implement operators
+sealed class Operator<E, U>(protected val upSource: Source<U>) : Source<E> {
   protected val activeSubscriptions = mutableListOf<Subscription<E>>()
   protected var upstreamDisposable: Disposable? = null
 
@@ -14,17 +17,17 @@ sealed class Transformation<E, U>(protected val upChannel: Channel<U>) : Channel
     activeSubscriptions.remove(subscription)
   }
 
-  override fun <T> map(transformation: (E) -> T): Channel<T> {
+  override fun <T> map(transformation: (E) -> T): Source<T> {
     return Map(this, transformation)
   }
 
-  override fun <T, O> combine(otherSource: Channel<O>, combinationMode: Channel.CombinationMode, transform: (E, O) -> T): Channel<T> {
+  override fun <T, O> combine(otherSource: Source<O>, combinationMode: Source.CombinationMode, transform: (E, O) -> T): Source<T> {
     return Combine(this, otherSource, combinationMode, transform)
   }
 
-  class Map<E, R>(upChannel: Channel<E>, private val mapTransform: (E) -> R): Transformation<R, E>(upChannel) {
+  class Map<E, R>(upSource: Source<E>, private val mapTransform: (E) -> R): Operator<R, E>(upSource) {
     override fun subscribe(operation: (R) -> Unit): Subscription<R> {
-      upstreamDisposable = upChannel.subscribe {
+      upstreamDisposable = upSource.subscribe {
         operation(mapTransform(it))
       }
       return super.subscribe(operation)
@@ -32,11 +35,11 @@ sealed class Transformation<E, U>(protected val upChannel: Channel<U>) : Channel
   }
 
   class Combine<S1, S2, R>(
-      private val sourceOne: Channel<S1>,
-      private val sourceTwo: Channel<S2>,
-      private val combinationMode: Channel.CombinationMode,
+      private val sourceOne: Source<S1>,
+      private val sourceTwo: Source<S2>,
+      private val combinationMode: Source.CombinationMode,
       private inline val transform: (S1, S2) -> R
-  ) : Transformation<R, S1>(sourceOne) {
+  ) : Operator<R, S1>(sourceOne) {
 
     private val compositeDisposeBag = CompositeDisposeBag()
     private var sourceOneLastElement: S1? = null
@@ -44,7 +47,7 @@ sealed class Transformation<E, U>(protected val upChannel: Channel<U>) : Channel
 
     override fun subscribe(operation: (R) -> Unit): Subscription<R> {
       when (combinationMode) {
-        Channel.CombinationMode.CombineLatest -> {
+        Source.CombinationMode.CombineLatest -> {
           compositeDisposeBag.add(sourceOne.subscribe {
             sourceOneLastElement = it
             sourceTwoLastElement?.run { operation(transform(it, this)) }
@@ -64,4 +67,4 @@ sealed class Transformation<E, U>(protected val upChannel: Channel<U>) : Channel
       activeSubscriptions.remove(subscription)
     }
   }
-}
+} */

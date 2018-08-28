@@ -10,7 +10,6 @@ dependencies {
     testCompile "org.jetbrains.kotlin:kotlin-test-js"
 }
 
-
 group = project_group_id
 version = project_version
 archivesBaseName = 'rx-common-js'
