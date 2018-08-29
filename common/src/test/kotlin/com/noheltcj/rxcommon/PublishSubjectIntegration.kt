@@ -58,4 +58,14 @@ class PublishSubjectIntegration {
     }
     testObserver.assertComplete()
   }
+
+  @Test
+  fun `given upstream has terminated, when subscribing, should emit error`() {
+    val expectedThrowable = Throwable("POW!")
+    PublishSubject<String>().apply {
+      subscribeTo(Observable(error = expectedThrowable))
+      subscribe(testObserver)
+    }
+    testObserver.assertTerminated(expectedThrowable)
+  }
 }

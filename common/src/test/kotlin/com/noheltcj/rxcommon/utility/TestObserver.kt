@@ -34,11 +34,9 @@ class TestObserver<E> : Observer<E> {
   /**
    * Asserts that the source has emitted a single value equal to [expected].
    *
-   * This method will fail the test if the source has already terminated with a throwable.
-   * The method will also fail in the case that more than one element has been emitted.
+   * This method will fail in the case that more than one element has been emitted.
    */
   fun assertValue(expected: E) {
-    assertNull(error, "Source has already been terminated with $error.")
     assertNotEquals(0, nextValues.size, "Source did not emit an element, expected 1 element.")
     assertEquals(1, nextValues.size, "Source emitted more than one element, " +
         "but only a single element is expected.")
@@ -47,11 +45,8 @@ class TestObserver<E> : Observer<E> {
 
   /**
    * Asserts that the whole sequence of emissions is equal to and in the same order as [expected].
-   *
-   * This method will fail the test if the source has already terminated with a throwable.
    */
   fun assertValues(expected: List<E>) {
-    assertNull(error, "Source has already been terminated with $error.")
     assertEquals(expected, nextValues)
   }
 

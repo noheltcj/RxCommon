@@ -2,6 +2,7 @@ package com.noheltcj.rxcommon
 
 import com.noheltcj.rxcommon.observables.Observable
 import com.noheltcj.rxcommon.subjects.BehaviorSubject
+import com.noheltcj.rxcommon.subjects.PublishSubject
 import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -46,5 +47,26 @@ class BehaviorSubjectIntegration {
       subscribe(testObserver)
     }
     testObserver.assertValue("upstream")
+  }
+
+  @Test
+  fun `given upstream has emitted complete, when subscribing, should emit seed and complete`() {
+    BehaviorSubject("seed").apply {
+      subscribeTo(Observable(completeOnSubscribe = true))
+      subscribe(testObserver)
+    }
+    testObserver.assertValue("seed")
+    testObserver.assertComplete()
+  }
+
+  @Test
+  fun `given upstream has terminated, when subscribing, should emit seed and terminate`() {
+    val expectedThrowable = Throwable("POW!")
+    BehaviorSubject("seed").apply {
+      subscribeTo(Observable(error = expectedThrowable))
+      subscribe(testObserver)
+    }
+    testObserver.assertValue("seed")
+    testObserver.assertTerminated(expectedThrowable)
   }
 }
