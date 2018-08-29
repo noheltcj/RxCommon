@@ -7,7 +7,7 @@ import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class BehaviorSubjectIntegration {
+class PublishSubjectIntegration {
   lateinit var testObserver: TestObserver<String>
 
   @BeforeTest
@@ -16,57 +16,56 @@ class BehaviorSubjectIntegration {
   }
 
   @Test
-  fun `when subscribing, should emit the seed`() {
-    BehaviorSubject("seed").subscribe(testObserver)
-    testObserver.assertValue("seed")
+  fun `given empty constructor used, when subscribing, should not emit`() {
+    PublishSubject<String>().subscribe(testObserver)
+    testObserver.assertValues(emptyList())
+    testObserver.assertNotComplete()
+    testObserver.assertNotTerminated()
   }
 
   @Test
   fun `given subscribed, when a new value published, should emit new value`() {
-    BehaviorSubject("1").apply {
+    PublishSubject<String>().apply {
       subscribe(testObserver)
       publish("2")
     }
-    testObserver.assertValues(listOf("1", "2"))
+    testObserver.assertValue("2")
   }
 
   @Test
-  fun `given upstream has not emitted, when subscribing, should emit the seed`() {
-    BehaviorSubject("seed").apply {
+  fun `given upstream has not emitted, when subscribing, should not emit`() {
+    PublishSubject<String>().apply {
       subscribeTo(Observable())
       subscribe(testObserver)
     }
-    testObserver.assertValue("seed")
+    testObserver.assertNoEmission()
   }
 
-
   @Test
-  fun `given upstream has emitted, when subscribing, should emit the upstream element`() {
-    BehaviorSubject("seed").apply {
+  fun `given upstream has emitted, when subscribing, should not emit values`() {
+    PublishSubject<String>().apply {
       subscribeTo(Observable(just = "upstream"))
       subscribe(testObserver)
     }
-    testObserver.assertValue("upstream")
+    testObserver.assertValues(emptyList())
   }
 
   @Test
-  fun `given upstream has emitted complete, when subscribing, should emit seed and complete`() {
-    BehaviorSubject("seed").apply {
+  fun `given upstream has emitted complete, when subscribing, should emit complete`() {
+    PublishSubject<String>().apply {
       subscribeTo(Observable(completeOnSubscribe = true))
       subscribe(testObserver)
     }
-    testObserver.assertValue("seed")
     testObserver.assertComplete()
   }
 
   @Test
-  fun `given upstream has terminated, when subscribing, should emit seed and terminate`() {
+  fun `given upstream has terminated, when subscribing, should emit error`() {
     val expectedThrowable = Throwable("POW!")
-    BehaviorSubject("seed").apply {
+    PublishSubject<String>().apply {
       subscribeTo(Observable(error = expectedThrowable))
       subscribe(testObserver)
     }
-    testObserver.assertValue("seed")
     testObserver.assertTerminated(expectedThrowable)
   }
 }

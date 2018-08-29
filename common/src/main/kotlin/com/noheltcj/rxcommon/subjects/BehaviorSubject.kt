@@ -1,7 +1,8 @@
 package com.noheltcj.rxcommon.subjects
 
 import com.noheltcj.rxcommon.disposables.Disposable
-import com.noheltcj.rxcommon.emitters.ObservableEmitter
+import com.noheltcj.rxcommon.emitters.Emitter
+import com.noheltcj.rxcommon.emitters.HotEmitter
 import com.noheltcj.rxcommon.observers.Observer
 
 /**
@@ -11,7 +12,7 @@ class BehaviorSubject<Element>(seed: Element) : Subject<Element>() {
   var value: Element = seed
     private set
 
-  override val emitter = ObservableEmitter<Element>()
+  override val emitter: Emitter<Element> = HotEmitter()
 
   override fun subscribe(observer: Observer<Element>): Disposable {
     observer.onNext(value)
