@@ -11,9 +11,9 @@ class Observable<E>(completeOnSubscribe: Boolean = false) : Source<E> {
   private val emitter: ColdEmitter<E> = ColdEmitter()
 
   init {
-      if (completeOnSubscribe) {
-        emitter.complete()
-      }
+    if (completeOnSubscribe) {
+      emitter.complete()
+    }
   }
 
   constructor(createWithEmitter : (Emitter<E>) -> Disposable) : this() {

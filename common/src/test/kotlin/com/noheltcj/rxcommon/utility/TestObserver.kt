@@ -69,7 +69,6 @@ class TestObserver<E> : Observer<E> {
     assertNull(error, "expected $error to be null.")
   }
 
-
   /**
    * Asserts that the source emitted complete.
    *
