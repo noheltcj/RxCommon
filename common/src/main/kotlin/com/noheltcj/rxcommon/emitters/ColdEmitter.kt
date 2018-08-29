@@ -28,12 +28,13 @@ class ColdEmitter<E> : Emitter<E> {
   }
 
   override fun next(value: E) {
-
+    forwardPressure.add(value)
     activeObservers.forEach { it.onNext(value) }
   }
 
   override fun terminate(throwable: Throwable) {
     isTerminated = true
+    terminalError = throwable
     if (released)
       activeObservers.forEach { it.onError(throwable) }
   }

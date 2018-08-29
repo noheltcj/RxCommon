@@ -6,19 +6,8 @@ import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observers.Observer
 
 interface Source<E> {
-  val emitter: Emitter<E>
-
-  fun subscribe(observer: Observer<E>) : Disposable {
-    emitter.addObserver(observer)
-
-    return Disposables.create {
-      emitter.dispose(observer)
-    }
-  }
-
-  fun unsubscribe(observer: Observer<E>) {
-    emitter.removeObserver(observer)
-  }
+  fun subscribe(observer: Observer<E>) : Disposable
+  fun unsubscribe(observer: Observer<E>)
 
 //  fun <T> map(transformation: (E) -> T) : Source<T, >
 //  fun <T, O> combine(otherSource: Source<O>,

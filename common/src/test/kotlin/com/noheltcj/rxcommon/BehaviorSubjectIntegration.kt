@@ -1,5 +1,6 @@
 package com.noheltcj.rxcommon
 
+import com.noheltcj.rxcommon.observables.Observable
 import com.noheltcj.rxcommon.subjects.BehaviorSubject
 import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.BeforeTest
@@ -25,20 +26,25 @@ class BehaviorSubjectIntegration {
       subscribe(testObserver)
       publish("2")
     }
-    testObserver.assertValue("2")
+    testObserver.assertValues(listOf("1", "2"))
   }
 
   @Test
   fun `given upstream has not emitted, when subscribing, should emit the seed`() {
-    // TODO: Implement this test when Observable exists
-  }
-
-  @Test
-  fun `given upstream has emitted, when subscribing, should emit latest value from upstream`() {
-    BehaviorSubject("1").apply {
-      subscribeTo(BehaviorSubject("2"))
+    BehaviorSubject("seed").apply {
+      subscribeTo(Observable())
       subscribe(testObserver)
     }
-    testObserver.assertValue("2")
+    testObserver.assertValue("seed")
+  }
+
+
+  @Test
+  fun `given upstream has emitted, when subscribing, should emit the upstream element`() {
+    BehaviorSubject("seed").apply {
+      subscribeTo(Observable(just = "upstream"))
+      subscribe(testObserver)
+    }
+    testObserver.assertValue("upstream")
   }
 }

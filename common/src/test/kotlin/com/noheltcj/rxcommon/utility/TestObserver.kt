@@ -18,13 +18,26 @@ class TestObserver<E> : Observer<E> {
   private var disposed = false
 
   /**
-   * Asserts that the last value emitted onNext is equal to [expected].
+   * Asserts that the source has emitted a single value equal to [expected].
    *
    * This method will fail the test if the observer has already terminated with a throwable.
+   * The method will also fail in the case that more than one element has been emitted.
    */
   fun assertValue(expected: E) {
     assertNull(error, "Observer has already been terminated with $error.")
-    assertEquals(expected, nextValues.lastOrNull())
+    assertEquals(1, nextValues.size, "Observer emitted more than one element, " +
+        "but only a single element is expected.")
+    assertEquals(expected, nextValues.first())
+  }
+
+  /**
+   * Asserts that the whole sequence of emissions is equal to and in the same order as [expected].
+   *
+   * This method will fail the test if the observer has already terminated with a throwable.
+   */
+  fun assertValues(expected: List<E>) {
+    assertNull(error, "Observer has already been terminated with $error.")
+    assertEquals(expected, nextValues)
   }
 
   /**

@@ -1,11 +1,26 @@
 package com.noheltcj.rxcommon.subjects
 
 import com.noheltcj.rxcommon.Source
+import com.noheltcj.rxcommon.disposables.Disposable
+import com.noheltcj.rxcommon.disposables.Disposables
 import com.noheltcj.rxcommon.emitters.HotEmitter
 import com.noheltcj.rxcommon.observers.AbstractObserver
+import com.noheltcj.rxcommon.observers.Observer
 
 abstract class Subject<E> : AbstractObserver<E>(), Source<E> {
-  abstract override val emitter : HotEmitter<E>
+  protected abstract val emitter : HotEmitter<E>
+
+  override fun subscribe(observer: Observer<E>) : Disposable {
+    emitter.addObserver(observer)
+
+    return Disposables.create {
+      emitter.dispose(observer)
+    }
+  }
+
+  override fun unsubscribe(observer: Observer<E>) {
+    emitter.removeObserver(observer)
+  }
 
   open fun subscribeTo(source: Source<E>) {
     source.subscribe(this)

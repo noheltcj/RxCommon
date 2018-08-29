@@ -2,23 +2,42 @@ package com.noheltcj.rxcommon.observables
 
 import com.noheltcj.rxcommon.Source
 import com.noheltcj.rxcommon.disposables.Disposable
+import com.noheltcj.rxcommon.disposables.Disposables
 import com.noheltcj.rxcommon.emitters.ColdEmitter
 import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observers.Observer
 
-class Observable<E>(private val completeOnSubscribe: Boolean = false) : Source<E> {
-  override val emitter: ColdEmitter<E> = ColdEmitter()
+class Observable<E>(completeOnSubscribe: Boolean = false) : Source<E> {
+  private val emitter: ColdEmitter<E> = ColdEmitter()
 
-  override fun subscribe(observer: Observer<E>): Disposable {
-    return super.subscribe(observer)
+  init {
+      if (completeOnSubscribe) {
+        emitter.complete()
+      }
   }
 
-  constructor(createBlock : (Emitter<E>) -> Disposable) : this() {
-    createBlock(emitter)
+  constructor(createWithEmitter : (Emitter<E>) -> Disposable) : this() {
+    createWithEmitter(emitter)
   }
 
   constructor(just: E) : this() {
     emitter.next(just)
     emitter.complete()
+  }
+
+  constructor(error: Throwable) : this() {
+    emitter.terminate(error)
+  }
+
+  override fun subscribe(observer: Observer<E>) : Disposable {
+    emitter.addObserver(observer)
+
+    return Disposables.create {
+      emitter.dispose(observer)
+    }
+  }
+
+  override fun unsubscribe(observer: Observer<E>) {
+    emitter.removeObserver(observer)
   }
 }
