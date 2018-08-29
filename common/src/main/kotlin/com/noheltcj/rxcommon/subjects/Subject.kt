@@ -1,11 +1,11 @@
 package com.noheltcj.rxcommon.subjects
 
 import com.noheltcj.rxcommon.Source
-import com.noheltcj.rxcommon.emitters.ObservableEmitter
+import com.noheltcj.rxcommon.emitters.HotEmitter
 import com.noheltcj.rxcommon.observers.AbstractObserver
 
 abstract class Subject<E> : AbstractObserver<E>(), Source<E> {
-  abstract override val emitter : ObservableEmitter<E>
+  abstract override val emitter : HotEmitter<E>
 
   open fun subscribeTo(source: Source<E>) {
     source.subscribe(this)

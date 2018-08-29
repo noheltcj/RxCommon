@@ -2,7 +2,7 @@ package com.noheltcj.rxcommon.emitters
 
 import com.noheltcj.rxcommon.observers.Observer
 
-class ObservableEmitter<E> : Emitter<E> {
+class HotEmitter<E> : Emitter<E> {
   private val activeObservers = mutableListOf<Observer<E>>()
 
   override var isDisposed = false
