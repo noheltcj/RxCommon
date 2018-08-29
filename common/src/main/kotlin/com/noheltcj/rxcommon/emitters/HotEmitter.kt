@@ -2,8 +2,9 @@ package com.noheltcj.rxcommon.emitters
 
 import com.noheltcj.rxcommon.observers.Observer
 
-class HotEmitter<E> : Emitter<E> {
+internal class HotEmitter<E> : Emitter<E> {
   private val activeObservers = mutableListOf<Observer<E>>()
+  private var terminalError: Throwable? = null
 
   override var isDisposed = false
     private set
@@ -14,6 +15,12 @@ class HotEmitter<E> : Emitter<E> {
 
   override fun addObserver(observer: Observer<E>) {
     activeObservers.add(observer)
+    if (isCompleted) {
+      observer.onComplete()
+    }
+    if (isTerminated) {
+      observer.onError(terminalError!!)
+    }
   }
 
   override fun removeObserver(observer: Observer<E>) {
@@ -25,6 +32,7 @@ class HotEmitter<E> : Emitter<E> {
   }
 
   override fun terminate(throwable: Throwable) {
+    terminalError = throwable
     isTerminated = true
     activeObservers.forEach { it.onError(throwable) }
   }
