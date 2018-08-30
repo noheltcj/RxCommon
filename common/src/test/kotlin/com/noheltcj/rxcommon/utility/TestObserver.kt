@@ -1,5 +1,6 @@
 package com.noheltcj.rxcommon.utility
 
+import com.noheltcj.rxcommon.Source
 import com.noheltcj.rxcommon.observers.Observer
 import kotlin.test.*
 
@@ -7,6 +8,7 @@ import kotlin.test.*
  * An observer for testing *sources*
  *
  * Captures events and records them for performing later assertions.
+ * It is recommended only to subscribe this observer to a single source.
  *
  * @param E The type of element this observer can receive
  * @see Observer
@@ -28,11 +30,11 @@ class TestObserver<E> : Observer<E> {
         "but $nextValues were emitted.")
     assertNotTerminated()
     assertNotComplete()
-    assertEquals(false, disposed, "Source emitted disposed, expected no emission.")
+    assertEquals(false, disposed, "Source was disposed, expected no notifications.")
   }
 
   /**
-   * Asserts that the source has emitted a single value equal to [expected].
+   * Asserts that the source has emitted a single element equal to [expected].
    *
    * This method will fail in the case that more than one element has been emitted.
    */
@@ -51,40 +53,58 @@ class TestObserver<E> : Observer<E> {
   }
 
   /**
-   * Asserts that the source emitted the [error].
+   * Asserts that the source terminated with [error].
    *
-   * This method will fail the test if the source has not emitted the expected [error].
+   * This method will fail the test if the source has not sent the the expected notification matching [error].
    */
   fun assertTerminated(error: Throwable) {
-    assertNotNull(error, "expected $error, but an error was not emitted.")
-    assertEquals(error, this.error, "expected $error, but was ${this.error}")
+    assertNotNull(error, "expected the source to be terminated with $error, but it has not terminated.")
+    assertEquals(error, this.error, "expected source to be terminated with $error, but was ${this.error}")
   }
 
   /**
-   * Asserts that the source has not emitted an error.
+   * Asserts that the source has not terminated with an error.
    *
-   * This method will fail the test if the source has emitted an error event.
+   * This method will fail the test if the source has terminated with an error notification.
    */
   fun assertNotTerminated() {
-    assertNull(error, "expected $error to be null.")
+    assertNull(error, "expected the error notification to not have been sent, but was $error ")
   }
 
   /**
-   * Asserts that the source emitted complete.
+   * Asserts that the source has completed.
    *
-   * This method will fail the test if the source has not emitted the completed event.
+   * This method will fail the test if the source has not sent the completed notification.
    */
   fun assertComplete() {
-    assertTrue(completed, "expected the source to have emitted complete.")
+    assertTrue(completed, "expected the source to have sent the completed notification.")
   }
 
   /**
-   * Asserts that the source has not emitted complete.
+   * Asserts that the source has not completed.
    *
-   * This method will fail the test if the source has emitted the completed event.
+   * This method will fail the test if the source has sent the completed notification.
    */
   fun assertNotComplete() {
-    assertFalse(completed, "expected the source to have never emitted the complete event.")
+    assertFalse(completed, "expected the source to have never sent the completed notification.")
+  }
+
+  /**
+   * Asserts that the source has been disposed.
+   *
+   * This method will fail the test if the source has not sent the dispose notification.
+   */
+  fun assertDisposed() {
+    assertTrue(disposed, "expected the source to have sent the dispose notification.")
+  }
+
+  /**
+   * Asserts that the source has not been disposed.
+   *
+   * This method will fail the test if the source has sent the dispose notification.
+   */
+  fun assertNotDisposed() {
+    assertFalse(disposed, "expected the source to have never sent the dispose notification.")
   }
 
   /**
@@ -95,21 +115,21 @@ class TestObserver<E> : Observer<E> {
   }
 
   /**
-   * Called when the source emits an error. It is not recommended to call this in a test.
+   * Called when the source terminates with an error notification. It is not recommended to call this in a test.
    */
   override fun onError(throwable: Throwable) {
     error = throwable
   }
 
   /**
-   * Called when the source emits completed. It is not recommended to call this in a test.
+   * Called when the source sends the completed notification. It is not recommended to call this in a test.
    */
   override fun onComplete() {
     completed = true
   }
 
   /**
-   * Called when the source emits disposed. It is not recommended to call this in a test.
+   * Called when the source sends the disposed notification. It is not recommended to call this in a test.
    */
   override fun onDispose() {
     disposed = true

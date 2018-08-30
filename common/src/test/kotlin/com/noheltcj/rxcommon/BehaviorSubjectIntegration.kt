@@ -1,8 +1,9 @@
 package com.noheltcj.rxcommon
 
+import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observables.Observable
+import com.noheltcj.rxcommon.observers.NextObserver
 import com.noheltcj.rxcommon.subjects.BehaviorSubject
-import com.noheltcj.rxcommon.subjects.PublishSubject
 import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -28,6 +29,17 @@ class BehaviorSubjectIntegration {
       publish("2")
     }
     testObserver.assertValues(listOf("1", "2"))
+  }
+
+  @Test
+  fun `given no observers and subsequent element published, when subscribing, should emit the last value`() {
+    BehaviorSubject("seed").apply {
+      publish("elementOne")
+      publish("elementTwo")
+
+      subscribe(testObserver)
+    }
+    testObserver.assertValue("elementTwo")
   }
 
   @Test

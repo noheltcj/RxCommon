@@ -1,22 +1,23 @@
 package com.noheltcj.rxcommon.observers
 
-abstract class AbstractObserver<E>(val next: (E) -> Unit = {},
-                                   val error: (Throwable) -> Unit = {},
-                                   val complete: () -> Unit = {},
-                                   val dispose: () -> Unit = {}) : Observer<E> {
+abstract class AbstractObserver<E>(val onNext: (E) -> Unit = {},
+                                   val onError: (Throwable) -> Unit = {},
+                                   val onComplete: () -> Unit = {},
+                                   val onDispose: () -> Unit = {}) : Observer<E> {
+
   override fun onNext(value: E) {
-    next(value)
+    onNext.invoke(value)
   }
 
   override fun onError(throwable: Throwable) {
-    error(throwable)
+    onError.invoke(throwable)
   }
 
   override fun onComplete() {
-    complete()
+    onComplete.invoke()
   }
 
   override fun onDispose() {
-    dispose()
+    onDispose.invoke()
   }
 }

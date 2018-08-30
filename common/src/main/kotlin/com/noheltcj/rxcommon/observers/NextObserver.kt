@@ -1,3 +1,3 @@
 package com.noheltcj.rxcommon.observers
 
-class NextObserver<E>(next: (E) -> Unit) : AbstractObserver<E>(next = next)
+class NextObserver<E>(onNext: (E) -> Unit) : AbstractObserver<E>(onNext = onNext)
