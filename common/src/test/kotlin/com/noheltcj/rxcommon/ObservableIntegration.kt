@@ -1,7 +1,6 @@
 package com.noheltcj.rxcommon
 
 import com.noheltcj.rxcommon.disposables.Disposables
-import com.noheltcj.rxcommon.disposables.InternalDisposable
 import com.noheltcj.rxcommon.observables.Observable
 import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.BeforeTest

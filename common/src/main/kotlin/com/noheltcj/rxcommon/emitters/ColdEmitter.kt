@@ -1,5 +1,6 @@
 package com.noheltcj.rxcommon.emitters
 
+import com.noheltcj.rxcommon.disposables.Disposable
 import com.noheltcj.rxcommon.observers.Observer
 
 internal class ColdEmitter<E> : Emitter<E> {
@@ -13,11 +14,14 @@ internal class ColdEmitter<E> : Emitter<E> {
     private set
 
   private var released = false
+  private var disposed = false
   private val forwardPressure = mutableListOf<E>()
   private var terminalError: Throwable? = null
 
   override fun addObserver(observer: Observer<E>) {
-    activeObservers.add(observer)
+    if (!disposed) {
+      activeObservers.add(observer)
+    }
     if (!released) {
       release()
     }
@@ -25,6 +29,9 @@ internal class ColdEmitter<E> : Emitter<E> {
 
   override fun removeObserver(observer: Observer<E>) {
     activeObservers.remove(observer)
+    if (activeObservers.size == 0) {
+      disposed = true
+    }
   }
 
   override fun next(value: E) {
@@ -45,9 +52,9 @@ internal class ColdEmitter<E> : Emitter<E> {
       activeObservers.forEach { it.onComplete() }
   }
 
-  override fun dispose(observer: Observer<E>) {
+  override fun dispose() {
     isDisposed = true
-    activeObservers.first { it == observer }.onDispose()
+    activeObservers.forEach(Observer<E>::onDispose)
   }
 
   private fun release() {

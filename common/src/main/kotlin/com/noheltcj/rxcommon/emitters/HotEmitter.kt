@@ -42,8 +42,8 @@ internal class HotEmitter<E> : Emitter<E> {
     activeObservers.forEach { it.onComplete() }
   }
 
-  override fun dispose(observer: Observer<E>) {
+  override fun dispose() {
     isDisposed = true
-    activeObservers.first { it == observer }.onDispose()
+    activeObservers.forEach(Observer<E>::onDispose)
   }
 }
