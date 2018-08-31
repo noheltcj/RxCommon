@@ -1,11 +1,21 @@
+@file:JvmName("Operators")
+
 package com.noheltcj.rxcommon.operators
 
-/* TODO: Implement operator extensions
-fun <S1, S2, R> Source<S1>.combineLatest(otherSource: Source<S2>, transform: (S1, S2) -> R): Source<R> =
-    Operator.Combine(this, otherSource, Source.CombinationMode.CombineLatest, transform)
+import com.noheltcj.rxcommon.Source
+import kotlin.jvm.JvmName
+
+/**
+ * While this doesn't follow kotlin convention, the Operators creates better native interfaces
+ */
+object OperatorHelpers {
+  fun <S1, S2> combineLatest(sourceOne: Source<S1>, sourceTwo: Source<S2>): Source<Pair<S1, S2>> =
+      CombineLatest(sourceOne, sourceTwo) {
+        e1, e2 -> e1 to e2
+      }
+}
 
 fun <S1, S2> Source<S1>.combineLatest(otherSource: Source<S2>): Source<Pair<S1, S2>> =
-    Operator.Combine(this, otherSource, Source.CombinationMode.CombineLatest) {
+    CombineLatest(this, otherSource) {
       e1, e2 -> e1 to e2
     }
-*/

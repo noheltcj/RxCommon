@@ -1,6 +1,5 @@
 package com.noheltcj.rxcommon.emitters
 
-import com.noheltcj.rxcommon.disposables.Disposable
 import com.noheltcj.rxcommon.observers.Observer
 
 internal class ColdEmitter<E> : Emitter<E> {

@@ -7,8 +7,8 @@ import com.noheltcj.rxcommon.emitters.ColdEmitter
 import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observers.Observer
 
-class Observable<E>(completeOnSubscribe: Boolean = false) : Source<E> {
-  private val emitter: ColdEmitter<E> = ColdEmitter()
+open class Observable<E>(completeOnSubscribe: Boolean = false) : Source<E> {
+  protected val emitter: Emitter<E> = ColdEmitter()
 
   init {
     if (completeOnSubscribe) {
