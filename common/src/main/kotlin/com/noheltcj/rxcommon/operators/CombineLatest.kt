@@ -5,7 +5,7 @@ import com.noheltcj.rxcommon.disposables.Disposable
 import com.noheltcj.rxcommon.disposables.Disposables
 import com.noheltcj.rxcommon.emitters.ColdEmitter
 import com.noheltcj.rxcommon.emitters.Emitter
-import com.noheltcj.rxcommon.observers.NextObserver
+import com.noheltcj.rxcommon.observers.AllObserver
 import com.noheltcj.rxcommon.observers.Observer
 
 class CombineLatest<S1, S2, R>(
@@ -21,14 +21,28 @@ class CombineLatest<S1, S2, R>(
   override fun subscribe(observer: Observer<R>): Disposable {
     emitter.addObserver(observer)
 
-    val upstreamOneDisposable = sourceOne.subscribe(NextObserver {
-      sourceOneLastElement = it
-      sourceTwoLastElement?.run { emitter.next(transform(it, this)) }
-    })
-    val upstreamTwoDisposable = sourceTwo.subscribe(NextObserver {
-      sourceTwoLastElement = it
-      sourceOneLastElement?.run { emitter.next(transform(this, it)) }
-    })
+    val upstreamOneDisposable = sourceOne.subscribe(
+        AllObserver(
+            onNext = {
+              sourceOneLastElement = it
+              sourceTwoLastElement?.run { emitter.next(transform(it, this)) }
+            },
+            onError = { emitter.terminate(it) },
+            onComplete = { emitter.complete() },
+            onDispose = { emitter.dispose() }
+        )
+    )
+    val upstreamTwoDisposable = sourceTwo.subscribe(
+        AllObserver(
+            onNext = {
+              sourceTwoLastElement = it
+              sourceOneLastElement?.run { emitter.next(transform(this, it)) }
+            },
+            onError = { emitter.terminate(it) },
+            onComplete = { emitter.complete() },
+            onDispose = { emitter.dispose() }
+        )
+    )
 
     return Disposables.create {
       emitter.removeObserver(observer)
