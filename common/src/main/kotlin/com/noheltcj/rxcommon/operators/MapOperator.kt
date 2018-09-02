@@ -5,6 +5,7 @@ import com.noheltcj.rxcommon.disposables.Disposable
 import com.noheltcj.rxcommon.disposables.Disposables
 import com.noheltcj.rxcommon.emitters.ColdEmitter
 import com.noheltcj.rxcommon.emitters.Emitter
+import com.noheltcj.rxcommon.observers.AllObserver
 import com.noheltcj.rxcommon.observers.NextObserver
 import com.noheltcj.rxcommon.observers.Observer
 
@@ -14,20 +15,17 @@ class MapOperator<U, E>(private val upstream: Source<U>, private val transform: 
   override fun subscribe(observer: Observer<E>): Disposable {
     emitter.addObserver(observer)
 
-    upstreamDisposable = upstream.subscribe(NextObserver {
-      emitter.next(transform(it))
-    })
+    val upstreamObserver = AllObserver<U> (
+        onNext = { emitter.next(transform(it)) },
+        onError = { emitter.terminate(it) },
+        onComplete = { emitter.complete() },
+        onDispose = { emitter.dispose() }
+    )
+    upstreamDisposable = upstream.subscribe(upstreamObserver)
 
     return Disposables.create {
-      emitter.removeObserver(observer)
+      unsubscribe(observer)
+      upstream.unsubscribe(upstreamObserver)
     }
-  }
-
-  override fun unsubscribe(observer: Observer<E>) {
-    emitter.removeObserver(observer)
-  }
-
-  override fun onDispose() {
-    upstreamDisposable?.dispose()
   }
 }

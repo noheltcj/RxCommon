@@ -6,6 +6,7 @@ import com.noheltcj.rxcommon.observables.Observable
 import com.noheltcj.rxcommon.observers.NextObserver
 import com.noheltcj.rxcommon.subjects.BehaviorSubject
 import com.noheltcj.rxcommon.subjects.PublishSubject
+import com.noheltcj.rxcommon.utility.JsName
 import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -19,7 +20,8 @@ class DisposableIntegrationTests {
   }
 
   @Test
-  fun `given upstream is cold and has subject observer, when subject is disposed, should dispose upstream`() {
+  @JsName("givenUpstreamIsColdAndHasObserver_whenObserverIsDisposed_shouldDisposeUpstream")
+  fun `given upstream is cold and has observer, when observer is disposed, should dispose upstream`() {
     lateinit var upstreamEmitter: Emitter<Int>
     val upstream = Observable<Int> {
       upstreamEmitter = it
@@ -45,7 +47,31 @@ class DisposableIntegrationTests {
   }
 
   @Test
-  fun `given cold source with an observer, when all observers disposed, should dispose source and never emit again`() {
+  @JsName("givenUpstreamIsColdAndHasTwoObservers_whenOneIsDisposed_shouldNotDisposeUpstream")
+  fun `given upstream is cold and has two observers, when one is disposed, should not dispose upstream`() {
+    lateinit var upstreamEmitter: Emitter<Int>
+    val upstream = Observable<Int> {
+      upstreamEmitter = it
+      Disposables.empty()
+    }
+    val upstreamTestObserver = TestObserver<Int>()
+    upstream.subscribe(upstreamTestObserver)
+    PublishSubject<Int>().apply {
+      subscribeTo(upstream)
+      subscribe(testObserver)
+      dispose()
+    }
+
+    testObserver.assertDisposed()
+
+    upstreamEmitter.next(1)
+
+    upstreamTestObserver.assertValue(1)
+  }
+
+  @Test
+  @JsName("givenColdSourceWithAnObserver_whenAllObserversDisposed_andNewObserverAdded_shouldDisposeSource")
+  fun `given cold source with an observer, when all observers disposed and a new observer is added, should dispose source`() {
     lateinit var capturedEmitter: Emitter<Int>
     Observable<Int> {
       capturedEmitter = it
@@ -69,7 +95,8 @@ class DisposableIntegrationTests {
   }
 
   @Test
-  fun `given hot source with an observer, when all observers disposed, should not dispose source and emit the last value`() {
+  @JsName("givenHotSourceWithAnObserver_whenAllObserversDisposed_andNewObserverAdded_shouldNotDisposeSource")
+  fun `given hot source with an observer, when all observers disposed and a new observer is added, should not dispose source`() {
     val emptyObserver = NextObserver<Int> {}
     BehaviorSubject(1).apply {
       subscribe(emptyObserver)

@@ -16,8 +16,20 @@ konanArtifacts {
         enableMultiplatform true
         extraOpts '-module_name', ''
     }
+
+    program('tests') {
+        srcDir 'src/test/kotlin'
+        enableMultiplatform true
+        commonSourceSet 'test'
+        libraries {
+            artifact 'RxCommon'
+        }
+        extraOpts '-tr'
+    }
 }
 
 dependencies {
     expectedBy project(':common')
 }
+
+task test(dependsOn: runTests)

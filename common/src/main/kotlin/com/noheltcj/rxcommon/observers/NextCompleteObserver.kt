@@ -4,6 +4,6 @@ class NextCompleteObserver<E> (
     onNext: (E) -> Unit,
     onComplete: () -> Unit
 ) : AbstractObserver<E>(
-    onNext = onNext,
-    onComplete = onComplete
+    doOnNext = onNext,
+    doOnComplete = onComplete
 )

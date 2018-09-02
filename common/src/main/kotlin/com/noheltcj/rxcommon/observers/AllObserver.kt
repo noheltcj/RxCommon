@@ -6,8 +6,8 @@ class AllObserver<E>(
     onComplete: () -> Unit,
     onDispose: () -> Unit
 ) : AbstractObserver<E>(
-    onNext = onNext,
-    onError = onError,
-    onComplete = onComplete,
-    onDispose = onDispose
+    doOnNext = onNext,
+    doOnError = onError,
+    doOnComplete = onComplete,
+    doOnDispose = onDispose
 )
