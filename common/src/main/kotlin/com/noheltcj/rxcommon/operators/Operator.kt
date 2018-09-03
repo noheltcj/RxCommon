@@ -24,6 +24,7 @@ abstract class Operator<E> : Source<E>, Observer<E> {
 
   override fun onDispose() {
     upstreamDisposable?.dispose()
+    emitter.dispose()
   }
 
   override fun unsubscribe(observer: Observer<E>) {
