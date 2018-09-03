@@ -1,12 +1,11 @@
 package com.noheltcj.rxcommon.operators
 
 import com.noheltcj.rxcommon.Source
-import com.noheltcj.rxcommon.disposables.CompositeDisposeBag
 import com.noheltcj.rxcommon.disposables.Disposable
 import com.noheltcj.rxcommon.disposables.Disposables
 import com.noheltcj.rxcommon.emitters.ColdEmitter
 import com.noheltcj.rxcommon.emitters.Emitter
-import com.noheltcj.rxcommon.observers.NextObserver
+import com.noheltcj.rxcommon.observers.AllObserver
 import com.noheltcj.rxcommon.observers.Observer
 
 class CombineLatest<S1, S2, R>(
@@ -14,7 +13,6 @@ class CombineLatest<S1, S2, R>(
     private val sourceTwo: Source<S2>,
     private inline val transform: (S1, S2) -> R
 ) : Operator<R>() {
-  private val compositeDisposeBag = CompositeDisposeBag()
   private var sourceOneLastElement: S1? = null
   private var sourceTwoLastElement: S2? = null
 
@@ -22,25 +20,34 @@ class CombineLatest<S1, S2, R>(
 
   override fun subscribe(observer: Observer<R>): Disposable {
     emitter.addObserver(observer)
-    compositeDisposeBag.add(sourceOne.subscribe(NextObserver {
-      sourceOneLastElement = it
-      sourceTwoLastElement?.run { emitter.next(transform(it, this)) }
-    }))
-    compositeDisposeBag.add(sourceTwo.subscribe(NextObserver {
-      sourceTwoLastElement = it
-      sourceOneLastElement?.run { emitter.next(transform(this, it)) }
-    }))
+
+    val upstreamOneDisposable = sourceOne.subscribe(
+        AllObserver(
+            onNext = {
+              sourceOneLastElement = it
+              sourceTwoLastElement?.run { emitter.next(transform(it, this)) }
+            },
+            onError = { emitter.terminate(it) },
+            onComplete = { emitter.complete() },
+            onDispose = { emitter.dispose() }
+        )
+    )
+    val upstreamTwoDisposable = sourceTwo.subscribe(
+        AllObserver(
+            onNext = {
+              sourceTwoLastElement = it
+              sourceOneLastElement?.run { emitter.next(transform(this, it)) }
+            },
+            onError = { emitter.terminate(it) },
+            onComplete = { emitter.complete() },
+            onDispose = { emitter.dispose() }
+        )
+    )
 
     return Disposables.create {
       emitter.removeObserver(observer)
+      upstreamOneDisposable.dispose()
+      upstreamTwoDisposable.dispose()
     }
-  }
-
-  override fun unsubscribe(observer: Observer<R>) {
-    emitter.removeObserver(observer)
-  }
-
-  override fun onDispose() {
-    compositeDisposeBag.dispose()
   }
 }

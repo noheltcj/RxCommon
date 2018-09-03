@@ -1,5 +1,5 @@
 # RxCommon
-A multi-platform (Native, JVM, and JS) implementation of ReactiveX.
+A multi-platform (Native, JVM, iOS, macOS, and JS) implementation of ReactiveX.
 
 ## Documentation
 Please refer to <https://reactivex.io> for documentation. 
@@ -12,17 +12,17 @@ There are several places requiring imports to utilize this library.
 
 ### Common Module
 ```groovy
-implementation "com.noheltcj:rx-common:$rx_common_version"
+implementation "com.noheltcj:rx-common:0.1.0"
 ```
 
 ### JVM Module
 ```groovy
-implementation "com.noheltcj:rx-common-jvm:$rx_common_version"
+implementation "com.noheltcj:rx-common-jvm:0.1.0"
 ```
 
 ### JavaScript Module
 ```groovy
-implementation "com.noheltcj:rx-common-js:$rx_common_version"
+implementation "com.noheltcj:rx-common-js:0.1.0"
 ```
 
 ### Native Module
@@ -84,7 +84,8 @@ but it's on the to-do list. In the meantime, it's best to keep any
 application state and and logic that utilized this library on one thread. 
 This doesn't mean you can't still operate on different threads, just 
 transfer any data back to the designated thread. I personally use the 
-existing platform specific implementations to do this.
+existing platform specific implementations of Rx (RxSwift, RxJava, etc) 
+to do this.
 
 ### Operators
 The operators are coming quickly, but not all have been implemented yet.

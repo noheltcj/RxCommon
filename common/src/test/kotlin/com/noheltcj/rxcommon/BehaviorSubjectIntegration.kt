@@ -1,9 +1,8 @@
 package com.noheltcj.rxcommon
 
-import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observables.Observable
-import com.noheltcj.rxcommon.observers.NextObserver
 import com.noheltcj.rxcommon.subjects.BehaviorSubject
+import com.noheltcj.rxcommon.utility.JsName
 import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -17,12 +16,14 @@ class BehaviorSubjectIntegration {
   }
 
   @Test
+  @JsName("whenSubscribing_shouldEmitTheSeed")
   fun `when subscribing, should emit the seed`() {
     BehaviorSubject("seed").subscribe(testObserver)
     testObserver.assertValue("seed")
   }
 
   @Test
+  @JsName("givenSubscribed_whenNewValuePublished_shouldEmitNewValue")
   fun `given subscribed, when a new value published, should emit new value`() {
     BehaviorSubject("1").apply {
       subscribe(testObserver)
@@ -32,6 +33,7 @@ class BehaviorSubjectIntegration {
   }
 
   @Test
+  @JsName("givenNoObservers_andSubsequentElementPublished_whenSubscribing_shouldEmitTheLastValue")
   fun `given no observers and subsequent element published, when subscribing, should emit the last value`() {
     BehaviorSubject("seed").apply {
       publish("elementOne")
@@ -43,6 +45,7 @@ class BehaviorSubjectIntegration {
   }
 
   @Test
+  @JsName("givenUpstreamHasNotEmitted_whenSubscribing_shouldEmitTheSeed")
   fun `given upstream has not emitted, when subscribing, should emit the seed`() {
     BehaviorSubject("seed").apply {
       subscribeTo(Observable())
@@ -53,6 +56,7 @@ class BehaviorSubjectIntegration {
 
 
   @Test
+  @JsName("givenUpstreamHasEmitted_whenSubscribing_shouldEmitTheUpstreamElement")
   fun `given upstream has emitted, when subscribing, should emit the upstream element`() {
     BehaviorSubject("seed").apply {
       subscribeTo(Observable(just = "upstream"))
@@ -62,6 +66,7 @@ class BehaviorSubjectIntegration {
   }
 
   @Test
+  @JsName("givenUpstreamHasEmittedComplete_whenSubscribing_shouldEmitSeedAndComplete")
   fun `given upstream has emitted complete, when subscribing, should emit seed and complete`() {
     BehaviorSubject("seed").apply {
       subscribeTo(Observable(completeOnSubscribe = true))
@@ -72,6 +77,7 @@ class BehaviorSubjectIntegration {
   }
 
   @Test
+  @JsName("givenUpstreamHasTerminated_whenSubscribing_shouldEmitSeedAndTerminate")
   fun `given upstream has terminated, when subscribing, should emit seed and terminate`() {
     val expectedThrowable = Throwable("POW!")
     BehaviorSubject("seed").apply {

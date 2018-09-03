@@ -33,7 +33,7 @@ open class Observable<E>(completeOnSubscribe: Boolean = false) : Source<E> {
     emitter.addObserver(observer)
 
     return Disposables.create {
-      emitter.removeObserver(observer)
+      unsubscribe(observer)
     }
   }
 

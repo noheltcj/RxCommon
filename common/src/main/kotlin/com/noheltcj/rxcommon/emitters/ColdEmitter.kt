@@ -13,12 +13,11 @@ internal class ColdEmitter<E> : Emitter<E> {
     private set
 
   private var released = false
-  private var disposed = false
   private val forwardPressure = mutableListOf<E>()
   private var terminalError: Throwable? = null
 
   override fun addObserver(observer: Observer<E>) {
-    if (!disposed) {
+    if (!isDisposed) {
       activeObservers.add(observer)
     }
     if (!released) {
@@ -27,9 +26,10 @@ internal class ColdEmitter<E> : Emitter<E> {
   }
 
   override fun removeObserver(observer: Observer<E>) {
+    observer.onDispose()
     activeObservers.remove(observer)
     if (activeObservers.size == 0) {
-      disposed = true
+      dispose()
     }
   }
 

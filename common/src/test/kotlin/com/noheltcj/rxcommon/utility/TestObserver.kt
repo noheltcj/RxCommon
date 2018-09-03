@@ -27,7 +27,7 @@ class TestObserver<E> : Observer<E> {
    */
   fun assertNoEmission() {
     assertEquals(0, nextValues.size, "expected no elements to be emitted, " +
-        "but $nextValues were emitted.")
+        "but $nextValues was emitted.")
     assertNotTerminated()
     assertNotComplete()
     assertEquals(false, disposed, "Source was disposed, expected no notifications.")

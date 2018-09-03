@@ -24,6 +24,7 @@ internal class HotEmitter<E> : Emitter<E> {
   }
 
   override fun removeObserver(observer: Observer<E>) {
+    observer.onDispose()
     activeObservers.remove(observer)
   }
 
