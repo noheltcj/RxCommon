@@ -12,21 +12,25 @@ import com.noheltcj.rxcommon.observers.Observer
 class FlatMap<E, U>(private val upstream: Source<U>, private val additionalSourceResolver: (U) -> Source<E>) : Operator<E>() {
   override val emitter: Emitter<E> = ColdEmitter()
 
-  private val disposeBag = CompositeDisposeBag()
-
   override fun subscribe(observer: Observer<E>): Disposable {
     emitter.addObserver(observer)
 
-    upstream.subscribe(
+    val disposeBag = CompositeDisposeBag()
+
+    disposeBag.add(upstream.subscribe(
         AllObserver(
             onNext = {
-              additionalSourceResolver(it).subscribe(this)
+              disposeBag.add(additionalSourceResolver(it).subscribe(this))
             },
             onError = { emitter.terminate(it) },
             onComplete = { emitter.complete() },
             onDispose = { emitter.dispose() }
         )
-    )
-    return Disposables.empty()
+    ))
+
+    return Disposables.create {
+      disposeBag.dispose()
+      unsubscribe(observer)
+    }
   }
 }

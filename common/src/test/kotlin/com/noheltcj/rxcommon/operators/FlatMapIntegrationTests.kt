@@ -1,6 +1,9 @@
 package com.noheltcj.rxcommon.operators
 
+import com.noheltcj.rxcommon.disposables.Disposables
+import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observables.Observable
+import com.noheltcj.rxcommon.observers.NextObserver
 import com.noheltcj.rxcommon.subjects.BehaviorSubject
 import com.noheltcj.rxcommon.subjects.PublishSubject
 import com.noheltcj.rxcommon.utility.JsName
@@ -65,6 +68,7 @@ class FlatMapIntegrationTests {
   }
 
   @Test
+  @JsName("givenUpstreamSourceFlatMappedToNewSeededSource_andOriginalEmitted_whenOriginalSourceEmitsAgain_shouldEmitSecondSourceValue")
   fun `given upstream source flatMapped to a seeded source and original source has emitted, when the original source emits again, should emit second source value`() {
     val observables = arrayOf(Observable(just = "1"), Observable(just = "2"))
     val originalSource = BehaviorSubject(seed = 0)
@@ -147,5 +151,56 @@ class FlatMapIntegrationTests {
     newSource.dispose()
 
     testObserver.assertDisposed()
+  }
+
+  @Test
+  @JsName("givenSubscribedToFlatMap_whenAllDisposed_shouldNotify")
+  fun `given subscribed to flatMap, when all disposed, should notify`() {
+    Observable<String>()
+        .flatMap { Observable<String>() }
+        .subscribe(testObserver)
+        .dispose()
+
+    testObserver.assertDisposed()
+  }
+
+
+  @Test
+  @JsName("givenSubscribedToFlatMap_whenAllDisposed_shouldDisposeUpstream")
+  fun `given subscribed to flatMap from cold upstream, when all disposed, should dispose upstream`() {
+    lateinit var emitter: Emitter<String>
+    val upstream = Observable<String>(createWithEmitter = {
+      emitter = it
+      Disposables.empty()
+    })
+
+    upstream
+        .flatMap { Observable<String>() }
+        .subscribe(NextObserver {})
+        .dispose()
+
+    upstream.subscribe(testObserver)
+    emitter.next("already disposed")
+
+    testObserver.assertNoEmission()
+  }
+
+  @Test
+  @JsName("givenSubscribedToFlatMapOfNewColdSource_andOriginalSourceEmitted_whenAllDisposed_shouldDisposeNewSource")
+  fun `given subscribed to flatMap of new cold source and original source emitted, when all disposed, should dispose new source`() {
+    lateinit var emitter: Emitter<String>
+    val newSource = Observable<String>(createWithEmitter = {
+      emitter = it
+      Disposables.empty()
+    })
+    Observable(just = "original")
+        .flatMap { newSource }
+        .subscribe(NextObserver {})
+        .dispose()
+
+    newSource.subscribe(testObserver)
+    emitter.next("already disposed")
+
+    testObserver.assertNoEmission()
   }
 }
