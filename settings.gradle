@@ -12,10 +12,6 @@ pluginManagement {
             if (requested.id.id == "kotlin-platform-js") {
                 useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${requested.version}")
             }
-
-            if (requested.id.id == "kotlin-platform-native") {
-                useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${requested.version}")
-            }
         }
     }
 }
