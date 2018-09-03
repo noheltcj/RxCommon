@@ -11,8 +11,8 @@ import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class FlatMapIntegrationTests {
-  private lateinit var testObserver: TestObserver<String>
+class SwitchMapIntegrationTests {
+  lateinit var testObserver: TestObserver<String>
 
   @BeforeTest
   fun beforeEach() {
@@ -20,20 +20,20 @@ class FlatMapIntegrationTests {
   }
 
   @Test
-  @JsName("givenFlatMappedSource_whenSubscribing_shouldNotEmit")
-  fun `given flatMapped source, when subscribing, should not emit`() {
+  @JsName("givenSwitchMap_whenSubscribing_shouldNotEmit")
+  fun `given switchMap, when subscribing, should not emit`() {
     Observable<Int>()
-        .flatMap { Observable(just = "") }
+        .switchMap { Observable(just = "") }
         .subscribe(testObserver)
 
     testObserver.assertNoEmission()
   }
 
   @Test
-  @JsName("givenSubscribedToFlatMappedSource_whenUpstreamEmits_shouldNotEmit")
-  fun `given subscribed to flatMapped source, when upstream emits, should not emit`() {
+  @JsName("givenSubscribedToSwitchMap_whenOriginalSourceEmits_shouldNotEmit")
+  fun `given subscribed to switchMap, when original source emits, should not emit`() {
     val source = PublishSubject<Int>()
-    source.flatMap { Observable<String>() }
+    source.switchMap { Observable<String>() }
         .subscribe(testObserver)
 
     source.publish(1)
@@ -42,21 +42,21 @@ class FlatMapIntegrationTests {
   }
 
   @Test
-  @JsName("givenSubscribedToFlatMappedSource_andUpstreamEmitted_whenNewSourceEmits_shouldEmitNewSourceValue")
-  fun `given subscribed to flatMapped source and upstream has emitted, when new source emits, should emit value of new emission`() {
+  @JsName("givenSubscribedToSwitchMap_andOriginalSourceEmitted_whenNewSourceEmits_shouldEmit")
+  fun `given subscribed to switchMap and original source has emitted, when new source emits, should emit`() {
     Observable(just = 1)
-        .flatMap { Observable(just = "hi") }
+        .switchMap { Observable(just = "hi") }
         .subscribe(testObserver)
 
     testObserver.assertValue("hi")
   }
 
   @Test
-  @JsName("givenSubscribedToFlatMappedSource_andBothUpstreamAndNewSourceEmitted_whenNewSourceEmitsAgain_shouldEmitValueOfNewEmission")
-  fun `given subscribed to flatMapped source and both upstream and new source emitted when new source emits again should emit new emission`() {
+  @JsName("givenSubscribedToSwitchMap_andBothOriginalAndNewSourcesEmitted_whenNewSourceEmitsAgain_shouldEmit")
+  fun `given subscribed to switchMap and both original and new sources emitted, when new source emits again, should emit`() {
     val newSource = PublishSubject<String>()
     Observable(just = 1)
-        .flatMap { integer ->
+        .switchMap { integer ->
           newSource.map { "$integer - $it" }
         }
         .subscribe(testObserver)
@@ -68,13 +68,13 @@ class FlatMapIntegrationTests {
   }
 
   @Test
-  @JsName("givenUpstreamSourceFlatMappedToNewSeededSource_andOriginalEmitted_whenOriginalSourceEmitsAgain_shouldEmitSecondSourceValue")
-  fun `given upstream source flatMapped to a seeded source and original source has emitted, when the original source emits again, should emit second source value`() {
+  @JsName("givenSwitchedToNewSource_whenSwitchingToNewSeededSource_shouldEmit")
+  fun `given switched to new source, when switching to new seeded source, should emit`() {
     val observables = arrayOf(Observable(just = "1"), Observable(just = "2"))
     val originalSource = BehaviorSubject(seed = 0)
 
     originalSource
-        .flatMap { observables[it] }
+        .switchMap { observables[it] }
         .subscribe(testObserver)
 
     originalSource.publish(1)
@@ -83,21 +83,20 @@ class FlatMapIntegrationTests {
   }
 
   @Test
-  @JsName("givenSubscribedToFlatMap_andResolvedSecondNewSource_whenFirstSourceEmits_shouldEmit")
-  fun `given subscribed to flatMap and resolved second new source, when first source emits, should emit`() {
+  @JsName("givenSubscribedToSwitchMap_andSwitchedFromFirstNewSource_whenOldSourceEmits_shouldNotEmit")
+  fun `given subscribed to switch map and switched from first new source, when old source emits, should not emit`() {
     val sourceOne = PublishSubject<String>()
     val observables = arrayOf(sourceOne, Observable<String>())
     val originalSource = BehaviorSubject(seed = 0)
 
     originalSource
-        .flatMap { observables[it] }
+        .switchMap { observables[it] }
         .subscribe(testObserver)
 
+    originalSource.publish(1)
     sourceOne.publish("2")
 
-    originalSource.publish(1)
-
-    testObserver.assertValue("2")
+    testObserver.assertNoEmission()
   }
 
   @Test
@@ -106,7 +105,7 @@ class FlatMapIntegrationTests {
     val expectedThrowable = Throwable("source")
 
     Observable<String>(error = expectedThrowable)
-        .flatMap { Observable(just = it) }
+        .switchMap { Observable(just = it) }
         .subscribe(testObserver)
 
     testObserver.assertValues(emptyList())
@@ -117,7 +116,7 @@ class FlatMapIntegrationTests {
   @JsName("givenUpstreamSourceCompleted_whenSubscribing_shouldNotify")
   fun `given upstream source completed, when subscribing, should notify`() {
     Observable<String>(completeOnSubscribe = true)
-        .flatMap { Observable(just = it) }
+        .switchMap { Observable(just = it) }
         .subscribe(testObserver)
 
     testObserver.assertValues(emptyList())
@@ -128,7 +127,7 @@ class FlatMapIntegrationTests {
   @JsName("givenSubscribedToFlatMap_whenTheSourceDisposes_shouldNotify")
   fun `given subscribed to flatMap, when the source disposes, should notify`() {
     val source = PublishSubject<String>()
-    source.flatMap { Observable(just = it) }
+    source.switchMap { Observable(just = it) }
         .subscribe(testObserver)
 
     source.dispose()
@@ -142,7 +141,7 @@ class FlatMapIntegrationTests {
   fun `given source emitted and new source terminated, when subscribing, should notify`() {
     val expectedThrowable = Throwable("flatMap error")
     Observable(just = 1)
-        .flatMap { Observable<String>(error = expectedThrowable) }
+        .switchMap { Observable<String>(error = expectedThrowable) }
         .subscribe(testObserver)
 
     testObserver.assertTerminated(expectedThrowable)
@@ -152,30 +151,17 @@ class FlatMapIntegrationTests {
   @JsName("givenSourceEmitted_andNewSourceCompleted_whenSubscribing_shouldNotify")
   fun `given source emitted and new source completed, when subscribing, should notify`() {
     Observable(just = 1)
-        .flatMap { Observable<String>(completeOnSubscribe = true) }
+        .switchMap { Observable<String>(completeOnSubscribe = true) }
         .subscribe(testObserver)
 
     testObserver.assertComplete()
   }
 
   @Test
-  @JsName("givenSubscribedToFlatMapAndOriginalSourceEmitted_whenNewSourceDisposed_shouldNotify")
-  fun `given subscribed to flatMap and original source emitted, when new source disposed, should notify`() {
-    val newSource = PublishSubject<String>()
-    Observable(just = 1)
-        .flatMap { newSource }
-        .subscribe(testObserver)
-
-    newSource.dispose()
-
-    testObserver.assertDisposed()
-  }
-
-  @Test
-  @JsName("givenSubscribedToFlatMap_whenAllDisposed_shouldNotify")
-  fun `given subscribed to flatMap, when all disposed, should notify`() {
+  @JsName("givenSubscribedToSwitchMap_whenAllDisposed_shouldNotify")
+  fun `given subscribed to switchMap, when all disposed, should notify`() {
     Observable<String>()
-        .flatMap { Observable<String>() }
+        .switchMap { Observable<String>() }
         .subscribe(testObserver)
         .dispose()
 
@@ -184,8 +170,8 @@ class FlatMapIntegrationTests {
 
 
   @Test
-  @JsName("givenSubscribedToFlatMap_whenAllDisposed_shouldDisposeUpstream")
-  fun `given subscribed to flatMap from cold upstream, when all disposed, should dispose upstream`() {
+  @JsName("givenSubscribedToSwitchMap_whenAllDisposed_shouldDisposeUpstream")
+  fun `given subscribed to switchMap from cold upstream, when all disposed, should dispose upstream`() {
     lateinit var emitter: Emitter<String>
     val upstream = Observable<String>(createWithEmitter = {
       emitter = it
@@ -193,7 +179,7 @@ class FlatMapIntegrationTests {
     })
 
     upstream
-        .flatMap { Observable<String>() }
+        .switchMap { Observable<String>() }
         .subscribe(NextObserver {})
         .dispose()
 
@@ -204,15 +190,15 @@ class FlatMapIntegrationTests {
   }
 
   @Test
-  @JsName("givenSubscribedToFlatMapOfNewColdSource_andOriginalSourceEmitted_whenAllDisposed_shouldDisposeNewSource")
-  fun `given subscribed to flatMap of new cold source and original source emitted, when all disposed, should dispose new source`() {
+  @JsName("givenSubscribedToSwitchMapOfNewColdSource_andOriginalSourceEmitted_whenAllDisposed_shouldDisposeNewSource")
+  fun `given subscribed to switchMap of new cold source and original source emitted, when all disposed, should dispose new source`() {
     lateinit var emitter: Emitter<String>
     val newSource = Observable<String>(createWithEmitter = {
       emitter = it
       Disposables.empty()
     })
     Observable(just = "original")
-        .flatMap { newSource }
+        .switchMap { newSource }
         .subscribe(NextObserver {})
         .dispose()
 
