@@ -15,17 +15,16 @@ class MapOperator<U, E>(private val upstream: Source<U>, private val transform: 
   override fun subscribe(observer: Observer<E>): Disposable {
     emitter.addObserver(observer)
 
-    val upstreamObserver = AllObserver<U> (
+    val upstreamDisposable = upstream.subscribe(AllObserver (
         onNext = { emitter.next(transform(it)) },
         onError = { emitter.terminate(it) },
         onComplete = { emitter.complete() },
         onDispose = { emitter.dispose() }
-    )
-    upstreamDisposable = upstream.subscribe(upstreamObserver)
+    ))
 
     return Disposables.create {
       unsubscribe(observer)
-      upstream.unsubscribe(upstreamObserver)
+      upstreamDisposable.dispose()
     }
   }
 }
