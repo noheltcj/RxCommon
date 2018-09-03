@@ -1,4 +1,4 @@
-package com.noheltcj.rxcommon
+package com.noheltcj.rxcommon.operators
 
 import com.noheltcj.rxcommon.disposables.Disposables
 import com.noheltcj.rxcommon.emitters.Emitter

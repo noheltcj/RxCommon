@@ -6,8 +6,6 @@ import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observers.Observer
 
 abstract class Operator<E> : Source<E>, Observer<E> {
-  protected var upstreamDisposable: Disposable? = null
-
   abstract val emitter: Emitter<E>
 
   override fun onNext(value: E) {
@@ -23,7 +21,7 @@ abstract class Operator<E> : Source<E>, Observer<E> {
   }
 
   override fun onDispose() {
-    upstreamDisposable?.dispose()
+    emitter.dispose()
   }
 
   override fun unsubscribe(observer: Observer<E>) {

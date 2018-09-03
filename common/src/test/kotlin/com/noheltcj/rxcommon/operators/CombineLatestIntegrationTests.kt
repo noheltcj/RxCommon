@@ -1,10 +1,9 @@
-package com.noheltcj.rxcommon
+package com.noheltcj.rxcommon.operators
 
 import com.noheltcj.rxcommon.disposables.Disposables
 import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observables.Observable
 import com.noheltcj.rxcommon.observers.NextObserver
-import com.noheltcj.rxcommon.operators.combineLatest
 import com.noheltcj.rxcommon.subjects.PublishSubject
 import com.noheltcj.rxcommon.utility.JsName
 import com.noheltcj.rxcommon.utility.TestObserver
