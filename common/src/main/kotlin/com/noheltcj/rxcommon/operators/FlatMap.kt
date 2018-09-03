@@ -9,7 +9,11 @@ import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observers.AllObserver
 import com.noheltcj.rxcommon.observers.Observer
 
-class FlatMap<E, U>(private val upstream: Source<U>, private val additionalSourceResolver: (U) -> Source<E>) : Operator<E>() {
+class FlatMap<E, U>(
+    private val upstream: Source<U>,
+    private val resolveAdditionalSource: (U) -> Source<E>
+) : Operator<E>() {
+
   override val emitter: Emitter<E> = ColdEmitter()
 
   override fun subscribe(observer: Observer<E>): Disposable {
@@ -20,7 +24,7 @@ class FlatMap<E, U>(private val upstream: Source<U>, private val additionalSourc
     disposeBag.add(upstream.subscribe(
         AllObserver(
             onNext = {
-              disposeBag.add(additionalSourceResolver(it).subscribe(this))
+              disposeBag.add(resolveAdditionalSource(it).subscribe(this))
             },
             onError = { emitter.terminate(it) },
             onComplete = { emitter.complete() },
