@@ -182,7 +182,6 @@ class FlatMapIntegrationTests {
     testObserver.assertDisposed()
   }
 
-
   @Test
   @JsName("givenSubscribedToFlatMap_whenAllDisposed_shouldDisposeUpstream")
   fun `given subscribed to flatMap from cold upstream, when all disposed, should dispose upstream`() {

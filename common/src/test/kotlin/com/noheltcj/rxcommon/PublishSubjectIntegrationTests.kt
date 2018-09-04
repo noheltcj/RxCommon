@@ -7,7 +7,7 @@ import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class PublishSubjectIntegration {
+class PublishSubjectIntegrationTests {
   lateinit var testObserver: TestObserver<String>
 
   @BeforeTest

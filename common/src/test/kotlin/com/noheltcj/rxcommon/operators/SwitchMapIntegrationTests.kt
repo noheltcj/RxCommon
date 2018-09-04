@@ -168,7 +168,6 @@ class SwitchMapIntegrationTests {
     testObserver.assertDisposed()
   }
 
-
   @Test
   @JsName("givenSubscribedToSwitchMap_whenAllDisposed_shouldDisposeUpstream")
   fun `given subscribed to switchMap from cold upstream, when all disposed, should dispose upstream`() {

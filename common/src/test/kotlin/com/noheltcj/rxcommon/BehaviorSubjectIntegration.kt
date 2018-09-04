@@ -54,7 +54,6 @@ class BehaviorSubjectIntegration {
     testObserver.assertValue("seed")
   }
 
-
   @Test
   @JsName("givenUpstreamHasEmitted_whenSubscribing_shouldEmitTheUpstreamElement")
   fun `given upstream has emitted, when subscribing, should emit the upstream element`() {

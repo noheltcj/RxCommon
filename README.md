@@ -7,6 +7,15 @@ Please refer to <https://reactivex.io> for documentation.
 While this is currently only a partial implementation, I'm doing my best 
 to follow the spec as closely as possible. 
 
+### Operators
+More operators are coming quickly, but not all have been implemented.
+
+Currently supported operators:
+* [Map](http://reactivex.io/documentation/operators/map.html)
+* [FlatMap](http://reactivex.io/documentation/operators/flatmap.html)
+* SwitchMap (non-interleaving variant of [FlatMap](http://reactivex.io/documentation/operators/flatmap.html))
+* [CombineLatest](http://reactivex.io/documentation/operators/combinelatest.html)
+
 ## Installing
 There are several places requiring imports to utilize this library.
 
@@ -58,7 +67,7 @@ konanArtifacts {
         target('ios_x64') {
             libraries {
                 useRepo 'lib/ios_x64'
-                noStdLib true // Necessary to avoid linker issues
+                noStdLib true // Avoids linker issues
                 klib 'RxCommon'
             }
         }
@@ -81,11 +90,8 @@ information when this library is imported as a framework in XCode.
 ### Concurrency
 There is absolutely no thread safety or scheduling in the library yet, 
 but it's on the to-do list. In the meantime, it's best to keep any 
-application state and and logic that utilized this library on one thread. 
+application state and logic that utilizes this library on one thread. 
 This doesn't mean you can't still operate on different threads, just 
 transfer any data back to the designated thread. I personally use the 
 existing platform specific implementations of Rx (RxSwift, RxJava, etc) 
 to do this.
-
-### Operators
-The operators are coming quickly, but not all have been implemented yet.
