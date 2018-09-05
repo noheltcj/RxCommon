@@ -5,14 +5,11 @@ import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.emitters.HotEmitter
 import com.noheltcj.rxcommon.observers.Observer
 
-/**
- * See <a href="http://www.introtorx.com/Content/v1.0.10621.0/02_KeyTypes.html#BehaviorSubject" />
- */
-class BehaviorSubject<E>(seed: E) : Subject<E>() {
+class BehaviorRelay<E>(seed: E) : Subject<E>() {
+  override val emitter: Emitter<E> = HotEmitter()
+
   var value = seed
     private set
-
-  override val emitter: Emitter<E> = HotEmitter()
 
   override fun subscribe(observer: Observer<E>): Disposable {
     observer.onNext(value)
@@ -23,4 +20,13 @@ class BehaviorSubject<E>(seed: E) : Subject<E>() {
     this.value = value
     super.onNext(value)
   }
+
+  /** This subject will not complete */
+  override fun onError(throwable: Throwable) {}
+
+  /** This subject will not complete */
+  override fun onComplete() {}
+
+  /** This subject will ignore dispose notifications from upstream */
+//  override fun onDispose() {}
 }

@@ -31,8 +31,7 @@ class SwitchMap<E, U>(
             currentSecondaryDisposable = tempDisposable
           },
           onError = { emitter.terminate(it) },
-          onComplete = { emitter.complete() },
-          onDispose = { emitter.dispose() }
+          onComplete = { emitter.complete() }
         )
     )
 
@@ -42,6 +41,4 @@ class SwitchMap<E, U>(
       unsubscribe(observer)
     }
   }
-
-  override fun onDispose() {}
 }

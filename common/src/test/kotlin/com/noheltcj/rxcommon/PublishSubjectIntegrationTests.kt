@@ -1,6 +1,9 @@
 package com.noheltcj.rxcommon
 
+import com.noheltcj.rxcommon.disposables.Disposables
+import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observables.Observable
+import com.noheltcj.rxcommon.observers.NextObserver
 import com.noheltcj.rxcommon.subjects.PublishSubject
 import com.noheltcj.rxcommon.utility.JsName
 import com.noheltcj.rxcommon.utility.TestObserver
@@ -29,7 +32,7 @@ class PublishSubjectIntegrationTests {
   fun `given subscribed, when a new value published, should emit new value`() {
     PublishSubject<String>().apply {
       subscribe(testObserver)
-      publish("2")
+      onNext("2")
     }
     testObserver.assertValue("2")
   }
@@ -38,7 +41,7 @@ class PublishSubjectIntegrationTests {
   @JsName("givenNotSubscribed_andAValuePublished_whenSubscribing_shouldNotEmit")
   fun `given not subscribed and a value was published, when subscribing, should not emit`() {
     PublishSubject<String>().apply {
-      publish("2")
+      onNext("2")
       subscribe(testObserver)
     }
     testObserver.assertNoEmission()
@@ -73,5 +76,46 @@ class PublishSubjectIntegrationTests {
       subscribe(testObserver)
     }
     testObserver.assertTerminated(expectedThrowable)
+  }
+
+  @Test
+  @JsName("givenSubscribedToUpstreamSource_whenUpstreamSourceDisposes_shouldNotify")
+  fun `given subscribed to upstream source, when upstream source disposes, should notify`() {
+    val upstream = PublishSubject<String>()
+    PublishSubject<String>().apply {
+      subscribeTo(upstream)
+      subscribe(testObserver)
+    }
+    upstream.onComplete()
+
+    testObserver.assertComplete()
+  }
+
+  @Test
+  @JsName("givenSubscribed_whenCompleted_shouldNotify")
+  fun `given subscribed, when completed, should notify`() {
+    PublishSubject<String>().apply {
+      subscribe(testObserver)
+    }.onComplete()
+
+    testObserver.assertComplete()
+  }
+
+  @Test
+  @JsName("givenSubscribedToColdUpstreamSource_whenDisposed_shouldDisposeUpstream")
+  fun `given subscribed to cold upstream source, when disposed, should dispose upstream`() {
+    lateinit var upstreamEmitter: Emitter<String>
+    val upstream = Observable<String>(createWithEmitter = {
+      upstreamEmitter = it
+      Disposables.empty()
+    })
+    PublishSubject<String>().apply {
+      subscribeTo(upstream)
+    }.onComplete()
+    upstream.subscribe(testObserver)
+
+    upstreamEmitter.next("already disposed")
+
+    testObserver.assertNoEmission()
   }
 }

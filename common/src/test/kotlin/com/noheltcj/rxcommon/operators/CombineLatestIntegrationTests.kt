@@ -154,7 +154,7 @@ class CombineLatestIntegrationTests {
     combinedObservable.subscribe(testObserver)
 
     emitterOne.next(2)
-    stringObs.publish("2")
+    stringObs.onNext("2")
 
     intTestObserver.assertNoEmission()
     stringTestObserver.assertValue("2")
@@ -180,13 +180,13 @@ class CombineLatestIntegrationTests {
   }
 
   @Test
-  @JsName("givenSubscribedToCombinedSources_whenOneIsDisposed_shouldDisposeOperator")
+  @JsName("givenSubscribedToCombinedSources_whenOneCompletes_shouldDisposeOperator")
   fun `given combined sources and one source is disposed, when subscribing, should dispose operator`() {
     val disposableSource = PublishSubject<String>()
     Observable<Int>().combineLatest(disposableSource).subscribe(testObserver)
 
-    disposableSource.dispose()
+    disposableSource.onComplete()
 
-    testObserver.assertDisposed()
+    testObserver.assertComplete()
   }
 }

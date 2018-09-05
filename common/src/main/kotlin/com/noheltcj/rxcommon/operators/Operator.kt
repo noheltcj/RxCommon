@@ -20,10 +20,6 @@ abstract class Operator<E> : Source<E>, Observer<E> {
     emitter.complete()
   }
 
-  override fun onDispose() {
-    emitter.dispose()
-  }
-
   override fun unsubscribe(observer: Observer<E>) {
     emitter.removeObserver(observer)
   }

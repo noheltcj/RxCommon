@@ -60,11 +60,11 @@ class MapOperatorIntegrationTests {
   }
 
   @Test
-  @JsName("givenDisposableSourceMapped_whenSourceDisposed_shouldNotify")
-  fun `given disposable source mapped, when the source disposes, should notify`() {
+  @JsName("givenDisposableSourceMapped_whenSourceCompletes_shouldNotify")
+  fun `given disposable source mapped, when the source completes, should notify`() {
     val source = PublishSubject<Int>()
     source.map { it.toString() }.subscribe(testObserver)
-    source.dispose()
+    source.onComplete()
 
     testObserver.assertDisposed()
   }
@@ -100,7 +100,7 @@ class MapOperatorIntegrationTests {
       subscribe(testObserver)
     }
 
-    source.publish(1)
+    source.onNext(1)
 
     testObserver.assertNoEmission()
   }
@@ -118,7 +118,7 @@ class MapOperatorIntegrationTests {
     val sourceTestObserver = TestObserver<Int>()
     source.subscribe(sourceTestObserver)
 
-    source.publish(1)
+    source.onNext(1)
 
     sourceTestObserver.assertValue(1)
   }

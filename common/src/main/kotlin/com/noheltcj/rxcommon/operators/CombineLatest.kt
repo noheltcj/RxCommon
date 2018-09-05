@@ -28,8 +28,7 @@ class CombineLatest<S1, S2, R>(
               sourceTwoLastElement?.run { emitter.next(transform(it, this)) }
             },
             onError = { emitter.terminate(it) },
-            onComplete = { emitter.complete() },
-            onDispose = { emitter.dispose() }
+            onComplete = { emitter.complete() }
         )
     )
     val upstreamTwoDisposable = sourceTwo.subscribe(
@@ -39,8 +38,7 @@ class CombineLatest<S1, S2, R>(
               sourceOneLastElement?.run { emitter.next(transform(this, it)) }
             },
             onError = { emitter.terminate(it) },
-            onComplete = { emitter.complete() },
-            onDispose = { emitter.dispose() }
+            onComplete = { emitter.complete() }
         )
     )
 

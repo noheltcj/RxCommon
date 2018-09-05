@@ -36,7 +36,7 @@ class SwitchMapIntegrationTests {
     source.switchMap { Observable<String>() }
         .subscribe(testObserver)
 
-    source.publish(1)
+    source.onNext(1)
 
     testObserver.assertNoEmission()
   }
@@ -61,8 +61,8 @@ class SwitchMapIntegrationTests {
         }
         .subscribe(testObserver)
 
-    newSource.publish("one")
-    newSource.publish("two")
+    newSource.onNext("one")
+    newSource.onNext("two")
 
     testObserver.assertValues(listOf("1 - one", "1 - two"))
   }
@@ -77,7 +77,7 @@ class SwitchMapIntegrationTests {
         .switchMap { observables[it] }
         .subscribe(testObserver)
 
-    originalSource.publish(1)
+    originalSource.onNext(1)
 
     testObserver.assertValues(listOf("1", "2"))
   }
@@ -93,8 +93,8 @@ class SwitchMapIntegrationTests {
         .switchMap { observables[it] }
         .subscribe(testObserver)
 
-    originalSource.publish(1)
-    sourceOne.publish("2")
+    originalSource.onNext(1)
+    sourceOne.onNext("2")
 
     testObserver.assertNoEmission()
   }
@@ -124,13 +124,13 @@ class SwitchMapIntegrationTests {
   }
 
   @Test
-  @JsName("givenSubscribedToFlatMap_whenTheSourceDisposes_shouldNotify")
-  fun `given subscribed to flatMap, when the source disposes, should notify`() {
+  @JsName("givenSubscribedToFlatMap_whenTheSourceCompletes_shouldNotify")
+  fun `given subscribed to flatMap, when the source completes, should notify`() {
     val source = PublishSubject<String>()
     source.switchMap { Observable(just = it) }
         .subscribe(testObserver)
 
-    source.dispose()
+    source.onComplete()
 
     testObserver.assertValues(emptyList())
     testObserver.assertDisposed()

@@ -30,8 +30,7 @@ class DisposableIntegrationTests {
     PublishSubject<Int>().apply {
       subscribeTo(upstream)
       subscribe(testObserver)
-      dispose()
-    }
+    }.onComplete()
 
     testObserver.assertDisposed()
 
@@ -59,14 +58,11 @@ class DisposableIntegrationTests {
     PublishSubject<Int>().apply {
       subscribeTo(upstream)
       subscribe(testObserver)
-      dispose()
-    }
+    }.onComplete()
 
     testObserver.assertDisposed()
 
-    upstreamEmitter.next(1)
-
-    upstreamTestObserver.assertValue(1)
+    upstreamTestObserver.assertComplete()
   }
 
   @Test

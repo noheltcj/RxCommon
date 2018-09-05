@@ -27,8 +27,7 @@ class FlatMap<E, U>(
               disposeBag.add(resolveAdditionalSource(it).subscribe(this))
             },
             onError = { emitter.terminate(it) },
-            onComplete = { emitter.complete() },
-            onDispose = { emitter.dispose() }
+            onComplete = { emitter.complete() }
         )
     ))
 

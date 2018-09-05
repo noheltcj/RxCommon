@@ -18,8 +18,7 @@ class MapOperator<U, E>(private val upstream: Source<U>, private val transform: 
     val upstreamDisposable = upstream.subscribe(AllObserver (
         onNext = { emitter.next(transform(it)) },
         onError = { emitter.terminate(it) },
-        onComplete = { emitter.complete() },
-        onDispose = { emitter.dispose() }
+        onComplete = { emitter.complete() }
     ))
 
     return Disposables.create {

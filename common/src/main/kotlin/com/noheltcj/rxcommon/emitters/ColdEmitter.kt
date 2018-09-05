@@ -1,5 +1,8 @@
 package com.noheltcj.rxcommon.emitters
 
+import com.noheltcj.rxcommon.exceptions.UndeliverableCompletionException
+import com.noheltcj.rxcommon.exceptions.UndeliverableEmissionException
+import com.noheltcj.rxcommon.exceptions.UndeliverableTerminationException
 import com.noheltcj.rxcommon.observers.Observer
 
 internal class ColdEmitter<E> : Emitter<E> {
@@ -26,7 +29,6 @@ internal class ColdEmitter<E> : Emitter<E> {
   }
 
   override fun removeObserver(observer: Observer<E>) {
-    observer.onDispose()
     activeObservers.remove(observer)
     if (activeObservers.size == 0) {
       dispose()
@@ -34,26 +36,36 @@ internal class ColdEmitter<E> : Emitter<E> {
   }
 
   override fun next(value: E) {
-    forwardPressure.add(value)
-    activeObservers.forEach { it.onNext(value) }
+    if (!isDisposed) {
+      activeObservers.forEach { it.onNext(value) }
+    } else {
+      throw UndeliverableEmissionException(value)
+    }
   }
 
   override fun terminate(throwable: Throwable) {
-    isTerminated = true
-    terminalError = throwable
-    if (released)
+    if (!isDisposed) {
+      isTerminated = true
       activeObservers.forEach { it.onError(throwable) }
+      dispose()
+    } else {
+      throw UndeliverableTerminationException(throwable)
+    }
   }
 
   override fun complete() {
-    isCompleted = true
-    if (released)
+    if (!isDisposed) {
+      isCompleted = true
       activeObservers.forEach { it.onComplete() }
+      dispose()
+    } else {
+      throw UndeliverableCompletionException()
+    }
   }
 
-  override fun dispose() {
+  private fun dispose() {
     isDisposed = true
-    activeObservers.forEach(Observer<E>::onDispose)
+    activeObservers.clear()
   }
 
   private fun release() {
