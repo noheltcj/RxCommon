@@ -31,20 +31,13 @@ abstract class Subject<E> : Observer<E>, Source<E>/*, Disposable*/ {
 
   override fun onComplete() {
     emitter.complete()
+    disposeBag.dispose()
   }
 
   override fun onError(throwable: Throwable) {
     emitter.terminate(throwable)
+    disposeBag.dispose()
   }
-
-//  override fun onDispose() {
-//    emitter.dispose()
-//  }
-
-//  override fun dispose() {
-//    emitter.dispose()
-//    disposeBag.dispose()
-//  }
 
   open fun subscribeTo(source: Source<E>) {
     disposeBag.add(source.subscribe(this))

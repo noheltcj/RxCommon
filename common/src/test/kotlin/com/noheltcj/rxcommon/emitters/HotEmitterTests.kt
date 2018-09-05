@@ -3,11 +3,12 @@ package com.noheltcj.rxcommon.emitters
 import com.noheltcj.rxcommon.exceptions.UndeliverableCompletionException
 import com.noheltcj.rxcommon.exceptions.UndeliverableEmissionException
 import com.noheltcj.rxcommon.exceptions.UndeliverableTerminationException
+import com.noheltcj.rxcommon.observers.NextObserver
 import com.noheltcj.rxcommon.utility.JsName
 import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.*
 
-class HotEmitterIntegrationTests {
+class HotEmitterTests {
   private lateinit var emitter: HotEmitter<Int>
   private lateinit var testObserver: TestObserver<Int>
 
@@ -15,22 +16,23 @@ class HotEmitterIntegrationTests {
   fun beforeEach() {
     emitter = HotEmitter()
     testObserver = TestObserver()
-
-    emitter.addObserver(testObserver)
   }
 
   @Test
   @JsName("givenObserver_whenNext_shouldEmitToObserver")
   fun `given observer, when next called, should emit to observer`() {
+    emitter.addObserver(testObserver)
+
     emitter.next(1)
 
     testObserver.assertValue(1)
   }
 
   @Test
-  @JsName("givenTerminated_whenNext_shouldThrow")
-  fun `given terminated, when next, should throw`() {
+  @JsName("givenObserverAndTerminated_whenNext_shouldThrow")
+  fun `given observer and terminated, when next, should throw`() {
     val expectedException = Throwable("boom")
+    emitter.addObserver(testObserver)
     emitter.terminate(expectedException)
 
     var capturedException: UndeliverableEmissionException? = null
@@ -47,8 +49,9 @@ class HotEmitterIntegrationTests {
   }
 
   @Test
-  @JsName("givenCompleted_whenNext_shouldThrow")
-  fun `given completed, when next, should throw`() {
+  @JsName("givenObserverAndCompleted_whenNext_shouldThrow")
+  fun `given observer and completed, when next, should throw`() {
+    emitter.addObserver(testObserver)
     emitter.complete()
 
     var capturedException: UndeliverableEmissionException? = null
@@ -68,6 +71,7 @@ class HotEmitterIntegrationTests {
   @JsName("givenObserver_whenTerminated_shouldNotifyObserver")
   fun `given observer, when terminated, should notify observer`() {
     val expectedThrowable = Throwable("pop")
+    emitter.addObserver(testObserver)
 
     emitter.terminate(expectedThrowable)
 
@@ -75,9 +79,10 @@ class HotEmitterIntegrationTests {
   }
 
   @Test
-  @JsName("givenTerminated_whenTerminated_shouldThrow")
-  fun `given terminated, when terminated again, should throw`() {
+  @JsName("givenObserverAndTerminated_whenTerminated_shouldThrow")
+  fun `given observer and terminated, when terminated again, should throw`() {
     val expectedThrowable = Throwable("crackle")
+    emitter.addObserver(testObserver)
     emitter.terminate(expectedThrowable)
 
     var capturedException: UndeliverableTerminationException? = null
@@ -93,8 +98,9 @@ class HotEmitterIntegrationTests {
   }
 
   @Test
-  @JsName("givenCompleted_whenTerminated_shouldNotNotifyObserver")
-  fun `given completed, when terminated, should not notify observer`() {
+  @JsName("givenObserverAndCompleted_whenTerminated_shouldNotNotifyObserver")
+  fun `given observer and completed, when terminated, should not notify observer`() {
+    emitter.addObserver(testObserver)
     emitter.complete()
 
     var capturedException: UndeliverableTerminationException? = null
@@ -113,15 +119,18 @@ class HotEmitterIntegrationTests {
   @Test
   @JsName("givenObserver_whenCompleted_shouldNotifyObserver")
   fun `given observer, when completed, should notify observer`() {
+    emitter.addObserver(testObserver)
+
     emitter.complete()
 
     testObserver.assertComplete()
   }
 
   @Test
-  @JsName("givenTerminated_whenCompleted_shouldThrow")
-  fun `given terminated, when completed, should throw`() {
+  @JsName("givenObserverAndTerminated_whenCompleted_shouldThrow")
+  fun `given observer and terminated, when completed, should throw`() {
     val expectedThrowable = Throwable("expected")
+    emitter.addObserver(testObserver)
     emitter.terminate(expectedThrowable)
 
     var capturedException: UndeliverableCompletionException? = null
@@ -138,8 +147,9 @@ class HotEmitterIntegrationTests {
 
 
   @Test
-  @JsName("givenCompleted_whenCompletedAgain_shouldThrow")
-  fun `given completed, when completed again, should throw`() {
+  @JsName("givenObserverAndCompleted_whenCompletedAgain_shouldThrow")
+  fun `given observer and completed, when completed again, should throw`() {
+    emitter.addObserver(testObserver)
     emitter.complete()
 
     var capturedException: UndeliverableCompletionException? = null
@@ -151,5 +161,29 @@ class HotEmitterIntegrationTests {
 
     assertNotNull(capturedException)
     testObserver.assertComplete()
+  }
+
+  @Test
+  @JsName("givenObserverAddedAndRemoved_whenAddingAnotherObserver_shouldBeCompleted")
+  fun `given observer added and removed, when adding another observer, should not be completed`() {
+    val emptyObserver = NextObserver<Int> {}
+    emitter.addObserver(emptyObserver)
+    emitter.removeObserver(emptyObserver)
+
+    assertFalse(emitter.isCompleted)
+  }
+
+  @Test
+  @JsName("givenObserverAddedAndRemoved_whenAnotherObserverAdded_shouldAcceptNewEmissions")
+  fun `given observer added and removed, when adding another observer, should accept new emissions`() {
+    val emptyObserver = NextObserver<Int> {}
+    emitter.addObserver(emptyObserver)
+    emitter.removeObserver(emptyObserver)
+
+    emitter.addObserver(testObserver)
+
+    emitter.next(1)
+
+    testObserver.assertValue(1)
   }
 }

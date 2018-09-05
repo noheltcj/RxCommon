@@ -20,23 +20,25 @@ internal class ColdEmitter<E> : Emitter<E> {
   private var terminalError: Throwable? = null
 
   override fun addObserver(observer: Observer<E>) {
-    if (!isDisposed) {
-      activeObservers.add(observer)
-    }
+    activeObservers.add(observer)
     if (!released) {
       release()
+    }
+    if (isDisposed) {
+      activeObservers.clear()
     }
   }
 
   override fun removeObserver(observer: Observer<E>) {
     activeObservers.remove(observer)
     if (activeObservers.size == 0) {
-      dispose()
+      complete()
     }
   }
 
   override fun next(value: E) {
     if (!isDisposed) {
+      forwardPressure.add(value)
       activeObservers.forEach { it.onNext(value) }
     } else {
       throw UndeliverableEmissionException(value)
@@ -46,6 +48,7 @@ internal class ColdEmitter<E> : Emitter<E> {
   override fun terminate(throwable: Throwable) {
     if (!isDisposed) {
       isTerminated = true
+      terminalError = throwable
       activeObservers.forEach { it.onError(throwable) }
       dispose()
     } else {
