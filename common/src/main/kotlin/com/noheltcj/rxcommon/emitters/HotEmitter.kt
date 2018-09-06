@@ -5,7 +5,7 @@ import com.noheltcj.rxcommon.exceptions.UndeliverableEmissionException
 import com.noheltcj.rxcommon.exceptions.UndeliverableTerminationException
 import com.noheltcj.rxcommon.observers.Observer
 
-internal class HotEmitter<E> : Emitter<E> {
+class HotEmitter<E> : Emitter<E> {
   private val activeObservers = mutableListOf<Observer<E>>()
 
   override var isDisposed = false

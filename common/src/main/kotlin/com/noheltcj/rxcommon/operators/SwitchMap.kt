@@ -38,7 +38,7 @@ class SwitchMap<E, U>(
     return Disposables.create {
       upstreamDisposable.dispose()
       currentSecondaryDisposable?.dispose()
-      unsubscribe(observer)
+      emitter.removeObserver(observer)
     }
   }
 }

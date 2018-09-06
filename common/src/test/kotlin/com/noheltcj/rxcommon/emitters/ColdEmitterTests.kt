@@ -202,6 +202,17 @@ class ColdEmitterTests {
   }
 
   @Test
+  @JsName("givenCompletedFromRemovingObservers_whenObserverAdded_shouldNotify")
+  fun `given completed from removing observers, when observer added, should notify`() {
+    val emptyObserver = NextObserver<Int> {}
+    emitter.addObserver(emptyObserver)
+    emitter.removeObserver(emptyObserver)
+    emitter.addObserver(testObserver)
+
+    testObserver.assertComplete()
+  }
+
+  @Test
   @JsName("givenObserverAddedAndRemoved_whenAddingAnotherObserver_shouldBeCompleted")
   fun `given observer added and removed, when adding another observer, should be completed`() {
     val emptyObserver = NextObserver<Int> {}

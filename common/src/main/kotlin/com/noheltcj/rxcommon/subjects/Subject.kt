@@ -21,17 +21,15 @@ abstract class Subject<E> : Observer<E>, Source<E>/*, Disposable*/ {
     }
   }
 
-  override fun unsubscribe(observer: Observer<E>) {
-    emitter.removeObserver(observer)
-  }
-
   override fun onNext(value: E) {
     emitter.next(value)
   }
 
   override fun onComplete() {
-    emitter.complete()
-    disposeBag.dispose()
+    if (!emitter.isDisposed) {
+      emitter.complete()
+      disposeBag.dispose()
+    }
   }
 
   override fun onError(throwable: Throwable) {

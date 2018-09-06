@@ -69,23 +69,23 @@ class BehaviorSubjectIntegrationTests {
   }
 
   @Test
-  @JsName("givenUpstreamHasEmittedComplete_whenSubscribing_shouldEmitSeedAndComplete")
-  fun `given upstream has emitted complete, when subscribing, should emit seed and complete`() {
+  @JsName("givenSubscribed_whenCompletedUpstreamAdded_shouldEmitSeedAndComplete")
+  fun `given subscribed, when completed upstream added, should emit seed and complete`() {
     BehaviorSubject("seed").apply {
-      subscribeTo(Observable(completeOnSubscribe = true))
       subscribe(testObserver)
+      subscribeTo(Observable(completeOnSubscribe = true))
     }
     testObserver.assertValue("seed")
     testObserver.assertComplete()
   }
 
   @Test
-  @JsName("givenUpstreamHasTerminated_whenSubscribing_shouldEmitSeedAndTerminate")
-  fun `given upstream has terminated, when subscribing, should emit seed and terminate`() {
+  @JsName("givenSubscribed_whenTerminatedUpstreamAdded_shouldEmitSeedAndTerminate")
+  fun `given subscribed, when terminated upstream added, should emit seed and terminate`() {
     val expectedThrowable = Throwable("POW!")
     BehaviorSubject("seed").apply {
-      subscribeTo(Observable(error = expectedThrowable))
       subscribe(testObserver)
+      subscribeTo(Observable(error = expectedThrowable))
     }
     testObserver.assertValue("seed")
     testObserver.assertTerminated(expectedThrowable)

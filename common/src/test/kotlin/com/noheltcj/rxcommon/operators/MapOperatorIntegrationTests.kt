@@ -95,8 +95,7 @@ class MapOperatorIntegrationTests {
     val source = PublishSubject<Int>()
     source.map { it.toString() }.apply {
       val emptyObserver = NextObserver<String> {}
-      subscribe(emptyObserver)
-      unsubscribe(emptyObserver)
+      subscribe(emptyObserver).dispose()
       subscribe(testObserver)
     }
 
@@ -111,8 +110,7 @@ class MapOperatorIntegrationTests {
     val source = PublishSubject<Int>()
     source.map { it.toString() }.apply {
       val emptyObserver = NextObserver<String> {}
-      subscribe(emptyObserver)
-      unsubscribe(emptyObserver)
+      subscribe(emptyObserver).dispose()
     }
 
     val sourceTestObserver = TestObserver<Int>()

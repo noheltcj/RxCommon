@@ -21,12 +21,9 @@ class BehaviorRelay<E>(seed: E) : Subject<E>() {
     super.onNext(value)
   }
 
-  /** This subject will not complete */
+  /** This subject will not terminate */
   override fun onError(throwable: Throwable) {}
 
   /** This subject will not complete */
   override fun onComplete() {}
-
-  /** This subject will ignore dispose notifications from upstream */
-//  override fun onDispose() {}
 }

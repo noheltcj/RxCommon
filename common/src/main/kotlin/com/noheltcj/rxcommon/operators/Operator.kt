@@ -19,8 +19,4 @@ abstract class Operator<E> : Source<E>, Observer<E> {
   override fun onComplete() {
     emitter.complete()
   }
-
-  override fun unsubscribe(observer: Observer<E>) {
-    emitter.removeObserver(observer)
-  }
 }

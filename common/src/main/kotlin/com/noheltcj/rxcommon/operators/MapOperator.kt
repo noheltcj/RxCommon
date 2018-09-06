@@ -22,7 +22,7 @@ class MapOperator<U, E>(private val upstream: Source<U>, private val transform: 
     ))
 
     return Disposables.create {
-      unsubscribe(observer)
+      emitter.removeObserver(observer)
       upstreamDisposable.dispose()
     }
   }

@@ -33,7 +33,7 @@ class FlatMap<E, U>(
 
     return Disposables.create {
       disposeBag.dispose()
-      unsubscribe(observer)
+      emitter.removeObserver(observer)
     }
   }
 }

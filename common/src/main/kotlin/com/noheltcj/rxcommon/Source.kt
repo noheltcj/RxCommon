@@ -9,7 +9,6 @@ import com.noheltcj.rxcommon.operators.SwitchMap
 
 interface Source<E> {
   fun subscribe(observer: Observer<E>) : Disposable
-  fun unsubscribe(observer: Observer<E>)
 
   fun <O, R> combineLatest(otherSource: Source<O>, transform: (E, O) -> R): Source<R> = CombineLatest(this, otherSource, transform)
   fun <R> map(transform: (E) -> R): Source<R> = MapOperator(this, transform)

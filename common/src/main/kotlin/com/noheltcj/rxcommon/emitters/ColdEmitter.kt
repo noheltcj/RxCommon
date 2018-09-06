@@ -5,7 +5,7 @@ import com.noheltcj.rxcommon.exceptions.UndeliverableEmissionException
 import com.noheltcj.rxcommon.exceptions.UndeliverableTerminationException
 import com.noheltcj.rxcommon.observers.Observer
 
-internal class ColdEmitter<E> : Emitter<E> {
+class ColdEmitter<E> : Emitter<E> {
   private val activeObservers = mutableListOf<Observer<E>>()
 
   override var isDisposed = false
@@ -27,11 +27,14 @@ internal class ColdEmitter<E> : Emitter<E> {
     if (isDisposed) {
       activeObservers.clear()
     }
+    if(isCompleted) {
+      observer.onComplete()
+    }
   }
 
   override fun removeObserver(observer: Observer<E>) {
     activeObservers.remove(observer)
-    if (activeObservers.size == 0) {
+    if (activeObservers.size == 0 && !isDisposed) {
       complete()
     }
   }

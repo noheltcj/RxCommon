@@ -9,10 +9,10 @@ import com.noheltcj.rxcommon.observers.Observer
  * See <a href="http://www.introtorx.com/Content/v1.0.10621.0/02_KeyTypes.html#BehaviorSubject" />
  */
 class BehaviorSubject<E>(seed: E) : Subject<E>() {
-  var value = seed
-    private set
-
   override val emitter: Emitter<E> = HotEmitter()
+
+  var value: E = seed
+    private set
 
   override fun subscribe(observer: Observer<E>): Disposable {
     observer.onNext(value)

@@ -33,11 +33,7 @@ open class Observable<E>(completeOnSubscribe: Boolean = false) : Source<E> {
     emitter.addObserver(observer)
 
     return Disposables.create {
-      unsubscribe(observer)
+      emitter.removeObserver(observer)
     }
-  }
-
-  override fun unsubscribe(observer: Observer<E>) {
-    emitter.removeObserver(observer)
   }
 }
