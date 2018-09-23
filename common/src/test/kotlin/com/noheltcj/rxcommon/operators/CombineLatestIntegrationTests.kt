@@ -126,7 +126,6 @@ class CombineLatestIntegrationTests {
 
     val combinedObservable = coldSource.combineLatest(hotSource)
 
-    // Activating and disposing cold emitter
     combinedObservable.subscribe(NextObserver {}).dispose()
 
     val coldSourceTestObserver = TestObserver<Int>()

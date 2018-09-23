@@ -145,7 +145,7 @@ class HotEmitterTests {
   }
 
   @Test
-  @JsName("givenObserverAddedAndRemoved_whenAnotherObserverAdded_shouldAcceptNewEmissions")
+  @JsName("givenObserverAddedAndRemoved_whenAddingAnotherObserver_shouldAcceptNewEmissions")
   fun `given observer added and removed, when adding another observer, should accept new emissions`() {
     val emptyObserver = NextObserver<Int> {}
     emitter.addObserver(emptyObserver)
