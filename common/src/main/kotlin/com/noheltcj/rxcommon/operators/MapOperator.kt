@@ -6,7 +6,6 @@ import com.noheltcj.rxcommon.disposables.Disposables
 import com.noheltcj.rxcommon.emitters.ColdEmitter
 import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observers.AllObserver
-import com.noheltcj.rxcommon.observers.NextObserver
 import com.noheltcj.rxcommon.observers.Observer
 
 class MapOperator<U, E>(private val upstream: Source<U>, private val transform: (U) -> E) : Operator<E>() {
@@ -18,12 +17,11 @@ class MapOperator<U, E>(private val upstream: Source<U>, private val transform: 
     val upstreamDisposable = upstream.subscribe(AllObserver (
         onNext = { emitter.next(transform(it)) },
         onError = { emitter.terminate(it) },
-        onComplete = { emitter.complete() },
-        onDispose = { emitter.dispose() }
+        onComplete = { emitter.complete() }
     ))
 
     return Disposables.create {
-      unsubscribe(observer)
+      emitter.removeObserver(observer)
       upstreamDisposable.dispose()
     }
   }

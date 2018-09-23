@@ -7,7 +7,7 @@ import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class ObservableIntegration {
+class ObservableIntegrationTests {
   private lateinit var testObserver: TestObserver<String>
 
   @BeforeTest

@@ -1,7 +1,6 @@
 package com.noheltcj.rxcommon.operators
 
 import com.noheltcj.rxcommon.Source
-import com.noheltcj.rxcommon.disposables.Disposable
 import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observers.Observer
 
@@ -18,13 +17,5 @@ abstract class Operator<E> : Source<E>, Observer<E> {
 
   override fun onComplete() {
     emitter.complete()
-  }
-
-  override fun onDispose() {
-    emitter.dispose()
-  }
-
-  override fun unsubscribe(observer: Observer<E>) {
-    emitter.removeObserver(observer)
   }
 }

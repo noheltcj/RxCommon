@@ -51,14 +51,16 @@ class CombineLatestIntegrationTests {
   @Test
   @JsName("givenSubscribedToCombinedColdSources_andBothHaveEmitted_whenOneEmitsAgain_shouldEmitTwoValues")
   fun `given subscribed to combined cold sources and both have emitted, when one emits again, should emit two values`() {
+    lateinit var emitter: Emitter<String>
     val stringObs = Observable<String>(createWithEmitter = {
       it.next("1")
-      it.next("2")
+      emitter = it
       Disposables.empty()
     })
-    val combinedObs = Observable(just = 1).combineLatest(stringObs)
 
-    combinedObs.subscribe(testObserver)
+    Observable(just = 1).combineLatest(stringObs).subscribe(testObserver)
+
+    emitter.next("2")
 
     testObserver.assertValues(listOf(
         1 to "1",
@@ -98,67 +100,39 @@ class CombineLatestIntegrationTests {
   @Test
   @JsName("givenSubscribedToCombinationOfColdSourcesWithNoOtherObservers_whenSubscriptionDisposed_shouldDisposeUpstream")
   fun `given subscribed to combination of cold sources with no other observers, when subscription disposed, should dispose upstream`() {
-    lateinit var emitterOne: Emitter<Int>
-    lateinit var emitterTwo: Emitter<String>
+    val intSource = Observable<Int>()
+    val stringSource = Observable<String>()
 
-    val intObs = Observable<Int>(createWithEmitter = {
-      emitterOne = it
-      Disposables.empty()
-    })
-    val stringObs = Observable<String>(createWithEmitter = {
-      emitterTwo = it
-      Disposables.empty()
-    })
+    val combinedObservable = intSource.combineLatest(stringSource)
 
-    val combinedObservable = intObs.combineLatest(stringObs)
-    val emptyObserver = NextObserver<Pair<Int, String>> {}
-    combinedObservable.subscribe(emptyObserver).dispose()
+    combinedObservable.subscribe(NextObserver {}).dispose()
 
-    val intTestObserver = TestObserver<Int>()
-    val stringTestObserver = TestObserver<String>()
+    val intSourceTestObserver = TestObserver<Int>()
+    val stringSourceTestObserver = TestObserver<String>()
 
-    intObs.subscribe(intTestObserver)
-    stringObs.subscribe(stringTestObserver)
+    intSource.subscribe(intSourceTestObserver)
+    stringSource.subscribe(stringSourceTestObserver)
     combinedObservable.subscribe(testObserver)
 
-    emitterOne.next(2)
-    emitterTwo.next("2")
-
-    intTestObserver.assertNoEmission()
-    stringTestObserver.assertNoEmission()
-    testObserver.assertNoEmission()
+    intSourceTestObserver.assertComplete()
+    stringSourceTestObserver.assertComplete()
   }
 
   @Test
   @JsName("givenSubscribedToHotAndColdSources_andNoOtherObservers_whenSubscriptionDisposed_shouldDisposeColdSources")
-  fun `given subscribed to hot and cold sources and no other observers, when subscription disposed, should dispose cold sources`() {
-    lateinit var emitterOne: Emitter<Int>
+  fun `given subscribed to hot and cold sources and no other observers, when subscription disposed, should complete cold sources`() {
+    val coldSource = Observable<Int>()
+    val hotSource = PublishSubject<String>()
 
-    val intObs = Observable<Int>(createWithEmitter = {
-      emitterOne = it
-      Disposables.empty()
-    })
-    val stringObs = PublishSubject<String>()
+    val combinedObservable = coldSource.combineLatest(hotSource)
 
-    val combinedObservable = intObs.combineLatest(stringObs)
-    val emptyObserver = NextObserver<Pair<Int, String>> {}
+    combinedObservable.subscribe(NextObserver {}).dispose()
 
-    // Activating and disposing cold emitters
-    combinedObservable.subscribe(emptyObserver).dispose()
+    val coldSourceTestObserver = TestObserver<Int>()
 
-    val intTestObserver = TestObserver<Int>()
-    val stringTestObserver = TestObserver<String>()
+    coldSource.subscribe(coldSourceTestObserver)
 
-    intObs.subscribe(intTestObserver)
-    stringObs.subscribe(stringTestObserver)
-    combinedObservable.subscribe(testObserver)
-
-    emitterOne.next(2)
-    stringObs.publish("2")
-
-    intTestObserver.assertNoEmission()
-    stringTestObserver.assertValue("2")
-    testObserver.assertNoEmission()
+    coldSourceTestObserver.assertComplete()
   }
 
   @Test
@@ -166,27 +140,30 @@ class CombineLatestIntegrationTests {
   fun `given combined sources and one source is terminated, when subscribing, should terminate operator`() {
     val expectedThrowable = Throwable("bam")
 
-    Observable<Int>().combineLatest(Observable<String>(error = expectedThrowable)).subscribe(testObserver)
+    Observable<Int>()
+        .combineLatest(Observable<String>(error = expectedThrowable))
+        .subscribe(testObserver)
 
     testObserver.assertTerminated(expectedThrowable)
   }
 
   @Test
-  @JsName("givenCombinedSources_andOneSourceCompleted_whenSubscribing_shouldCompleteOperator")
-  fun `given combined sources and one source is completed, when subscribing, should complete operator`() {
-    Observable<Int>().combineLatest(Observable<String>(completeOnSubscribe = true)).subscribe(testObserver)
+  @JsName("givenCombinedSources_andOneSourceCompleted_whenSubscribing_shouldNotComplete")
+  fun `given combined sources and one source is completed, when subscribing, should not complete`() {
+    Observable<Int>()
+        .combineLatest(Observable<String>(completeOnSubscribe = true))
+        .subscribe(testObserver)
 
-    testObserver.assertComplete()
+    testObserver.assertNotComplete()
   }
 
   @Test
-  @JsName("givenSubscribedToCombinedSources_whenOneIsDisposed_shouldDisposeOperator")
-  fun `given combined sources and one source is disposed, when subscribing, should dispose operator`() {
-    val disposableSource = PublishSubject<String>()
-    Observable<Int>().combineLatest(disposableSource).subscribe(testObserver)
+  @JsName("givenCombinedSources_andBothSourcesCompleted_whenSubscribing_shouldComplete")
+  fun `given combined sources and both sources have completed, when subscribing, should complete`() {
+    Observable<Int>(completeOnSubscribe = true)
+        .combineLatest(Observable<String>(completeOnSubscribe = true))
+        .subscribe(testObserver)
 
-    disposableSource.dispose()
-
-    testObserver.assertDisposed()
+    testObserver.assertComplete()
   }
 }

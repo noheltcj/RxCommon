@@ -1,10 +1,10 @@
 package com.noheltcj.rxcommon.emitters
 
+import com.noheltcj.rxcommon.exceptions.UndeliverableEmissionException
 import com.noheltcj.rxcommon.observers.Observer
 
-internal class HotEmitter<E> : Emitter<E> {
+class HotEmitter<E> : Emitter<E> {
   private val activeObservers = mutableListOf<Observer<E>>()
-  private var terminalError: Throwable? = null
 
   override var isDisposed = false
     private set
@@ -14,37 +14,39 @@ internal class HotEmitter<E> : Emitter<E> {
     private set
 
   override fun addObserver(observer: Observer<E>) {
-    activeObservers.add(observer)
-    if (isCompleted) {
-      observer.onComplete()
-    }
-    if (isTerminated) {
-      observer.onError(terminalError!!)
-    }
+    if (!isDisposed)
+      activeObservers.add(observer)
   }
 
   override fun removeObserver(observer: Observer<E>) {
-    observer.onDispose()
     activeObservers.remove(observer)
   }
 
   override fun next(value: E) {
-    activeObservers.forEach { it.onNext(value) }
+    if (!isDisposed) {
+      activeObservers.forEach { it.onNext(value) }
+    } else {
+      throw UndeliverableEmissionException(value)
+    }
   }
 
   override fun terminate(throwable: Throwable) {
-    terminalError = throwable
-    isTerminated = true
-    activeObservers.forEach { it.onError(throwable) }
+    if (!isDisposed) {
+      isTerminated = true
+      activeObservers.forEach { it.onError(throwable) }
+      dispose()
+    }
   }
 
   override fun complete() {
-    isCompleted = true
-    activeObservers.forEach { it.onComplete() }
+    if (!isDisposed) {
+      isCompleted = true
+      activeObservers.forEach { it.onComplete() }
+      dispose()
+    }
   }
 
-  override fun dispose() {
+  private fun dispose() {
     isDisposed = true
-    activeObservers.forEach(Observer<E>::onDispose)
   }
 }

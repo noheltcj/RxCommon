@@ -9,5 +9,6 @@ class CompositeDisposeBag : Disposable {
 
   override fun dispose() {
     disposables.forEach(Disposable::dispose)
+    disposables.clear()
   }
 }

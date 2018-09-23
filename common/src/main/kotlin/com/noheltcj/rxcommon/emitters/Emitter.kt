@@ -13,5 +13,4 @@ interface Emitter<E> {
   fun next(value: E)
   fun terminate(throwable: Throwable)
   fun complete()
-  fun dispose()
 }

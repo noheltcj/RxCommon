@@ -1,7 +1,5 @@
 package com.noheltcj.rxcommon.operators
 
-import com.noheltcj.rxcommon.disposables.Disposables
-import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observables.Observable
 import com.noheltcj.rxcommon.observers.NextObserver
 import com.noheltcj.rxcommon.subjects.PublishSubject
@@ -60,11 +58,11 @@ class MapOperatorIntegrationTests {
   }
 
   @Test
-  @JsName("givenDisposableSourceMapped_whenSourceDisposed_shouldNotify")
-  fun `given disposable source mapped, when the source disposes, should notify`() {
+  @JsName("givenDisposableSourceMapped_whenSourceCompletes_shouldNotify")
+  fun `given disposable source mapped, when the source completes, should notify`() {
     val source = PublishSubject<Int>()
     source.map { it.toString() }.subscribe(testObserver)
-    source.dispose()
+    source.onComplete()
 
     testObserver.assertDisposed()
   }
@@ -72,11 +70,7 @@ class MapOperatorIntegrationTests {
   @Test
   @JsName("givenColdSourceMapped_whenOnlyObserverDisposed_shouldDisposeSource")
   fun `given cold source mapped, when the only observer disposed, should dispose source`() {
-    lateinit var sourceEmitter: Emitter<Int>
-    val source = Observable<Int>(createWithEmitter = {
-      sourceEmitter = it
-      Disposables.empty()
-    })
+    val source = Observable<Int>()
     source.map { it.toString() }
         .subscribe(testObserver)
         .dispose()
@@ -84,9 +78,7 @@ class MapOperatorIntegrationTests {
     val sourceTestObserver = TestObserver<Int>()
     source.subscribe(sourceTestObserver)
 
-    sourceEmitter.next(1)
-
-    sourceTestObserver.assertNoEmission()
+    sourceTestObserver.assertDisposed()
   }
 
   @Test
@@ -94,15 +86,11 @@ class MapOperatorIntegrationTests {
   fun `given hot source mapped, when the only observer disposed, should dispose operator`() {
     val source = PublishSubject<Int>()
     source.map { it.toString() }.apply {
-      val emptyObserver = NextObserver<String> {}
-      subscribe(emptyObserver)
-      unsubscribe(emptyObserver)
+      subscribe(TestObserver()).dispose()
       subscribe(testObserver)
     }
 
-    source.publish(1)
-
-    testObserver.assertNoEmission()
+    testObserver.assertDisposed()
   }
 
   @Test
@@ -111,14 +99,13 @@ class MapOperatorIntegrationTests {
     val source = PublishSubject<Int>()
     source.map { it.toString() }.apply {
       val emptyObserver = NextObserver<String> {}
-      subscribe(emptyObserver)
-      unsubscribe(emptyObserver)
+      subscribe(emptyObserver).dispose()
     }
 
     val sourceTestObserver = TestObserver<Int>()
     source.subscribe(sourceTestObserver)
 
-    source.publish(1)
+    source.onNext(1)
 
     sourceTestObserver.assertValue(1)
   }

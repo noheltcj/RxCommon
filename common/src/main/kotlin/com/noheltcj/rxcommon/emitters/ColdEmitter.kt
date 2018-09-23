@@ -1,8 +1,9 @@
 package com.noheltcj.rxcommon.emitters
 
+import com.noheltcj.rxcommon.exceptions.UndeliverableEmissionException
 import com.noheltcj.rxcommon.observers.Observer
 
-internal class ColdEmitter<E> : Emitter<E> {
+class ColdEmitter<E> : Emitter<E> {
   private val activeObservers = mutableListOf<Observer<E>>()
 
   override var isDisposed = false
@@ -17,43 +18,48 @@ internal class ColdEmitter<E> : Emitter<E> {
   private var terminalError: Throwable? = null
 
   override fun addObserver(observer: Observer<E>) {
-    if (!isDisposed) {
-      activeObservers.add(observer)
-    }
-    if (!released) {
-      release()
-    }
+    activeObservers.add(observer)
+    if (!released) release()
+    if (isDisposed) activeObservers.clear()
+    if (isCompleted) observer.onComplete()
   }
 
   override fun removeObserver(observer: Observer<E>) {
-    observer.onDispose()
     activeObservers.remove(observer)
-    if (activeObservers.size == 0) {
-      dispose()
+    if (activeObservers.size == 0 && !isDisposed) {
+      complete()
     }
   }
 
   override fun next(value: E) {
-    forwardPressure.add(value)
-    activeObservers.forEach { it.onNext(value) }
+    if (!isDisposed) {
+      forwardPressure.add(value)
+      activeObservers.forEach { it.onNext(value) }
+    } else {
+      throw UndeliverableEmissionException(value)
+    }
   }
 
   override fun terminate(throwable: Throwable) {
-    isTerminated = true
-    terminalError = throwable
-    if (released)
+    if (!isDisposed) {
+      isTerminated = true
+      terminalError = throwable
       activeObservers.forEach { it.onError(throwable) }
+      dispose()
+    }
   }
 
   override fun complete() {
-    isCompleted = true
-    if (released)
+    if (!isDisposed) {
+      isCompleted = true
       activeObservers.forEach { it.onComplete() }
+      dispose()
+    }
   }
 
-  override fun dispose() {
+  private fun dispose() {
     isDisposed = true
-    activeObservers.forEach(Observer<E>::onDispose)
+    activeObservers.clear()
   }
 
   private fun release() {
@@ -62,9 +68,7 @@ internal class ColdEmitter<E> : Emitter<E> {
       forwardPressure.forEach { element ->
         observer.onNext(element)
       }
-      if (isCompleted)
-        observer.onComplete()
-      terminalError?.run { observer.onError(this) }
+      terminalError?.also(observer::onError)
     }
   }
 }

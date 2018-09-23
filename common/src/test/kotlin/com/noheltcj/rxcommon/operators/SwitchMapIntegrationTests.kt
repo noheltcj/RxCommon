@@ -1,7 +1,6 @@
 package com.noheltcj.rxcommon.operators
 
 import com.noheltcj.rxcommon.disposables.Disposables
-import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observables.Observable
 import com.noheltcj.rxcommon.observers.NextObserver
 import com.noheltcj.rxcommon.subjects.BehaviorSubject
@@ -21,7 +20,7 @@ class SwitchMapIntegrationTests {
 
   @Test
   @JsName("givenSwitchMap_whenSubscribing_shouldNotEmit")
-  fun `given switchMap, when subscribing, should not emit`() {
+  fun `given switchmap, when subscribing, should not emit`() {
     Observable<Int>()
         .switchMap { Observable(just = "") }
         .subscribe(testObserver)
@@ -30,20 +29,20 @@ class SwitchMapIntegrationTests {
   }
 
   @Test
-  @JsName("givenSubscribedToSwitchMap_whenOriginalSourceEmits_shouldNotEmit")
-  fun `given subscribed to switchMap, when original source emits, should not emit`() {
+  @JsName("givenSubscribedToSwitchMap_whenUpstreamEmits_shouldNotEmit")
+  fun `given subscribed to switchmap, when upstream emits, should not emit`() {
     val source = PublishSubject<Int>()
     source.switchMap { Observable<String>() }
         .subscribe(testObserver)
 
-    source.publish(1)
+    source.onNext(1)
 
     testObserver.assertNoEmission()
   }
 
   @Test
-  @JsName("givenSubscribedToSwitchMap_andOriginalSourceEmitted_whenNewSourceEmits_shouldEmit")
-  fun `given subscribed to switchMap and original source has emitted, when new source emits, should emit`() {
+  @JsName("givenSubscribedToSwitchMap_andUpstreamEmitted_whenNewSourceEmits_shouldEmit")
+  fun `given subscribed to switchmap and upstream has emitted, when new source emits, should emit`() {
     Observable(just = 1)
         .switchMap { Observable(just = "hi") }
         .subscribe(testObserver)
@@ -52,8 +51,25 @@ class SwitchMapIntegrationTests {
   }
 
   @Test
-  @JsName("givenSubscribedToSwitchMap_andBothOriginalAndNewSourcesEmitted_whenNewSourceEmitsAgain_shouldEmit")
-  fun `given subscribed to switchMap and both original and new sources emitted, when new source emits again, should emit`() {
+  @JsName("givenSubscribedToNewSwitchedSource_andUpstreamTerminated_whenNewSourceEmits_shouldNotEmit")
+  fun `given subscribed to new switched source and upstream terminated, when new source emits, should not emit`() {
+    val newSource = PublishSubject<String>()
+    Observable<Int>(createWithEmitter = { emitter ->
+      emitter.next(1)
+      emitter.terminate(Throwable())
+      Disposables.empty()
+    }).switchMap { integer ->
+      newSource.map { "$integer - $it" }
+    }.subscribe(testObserver)
+
+    newSource.onNext("one")
+
+    testObserver.assertValues(emptyList())
+  }
+
+  @Test
+  @JsName("givenSubscribedToSwitchMap_andBothUpstreamAndNewSourcesEmitted_whenNewSourceEmitsAgain_shouldEmit")
+  fun `given subscribed to switchmap and both upstream and new sources emitted, when new source emits again, should emit`() {
     val newSource = PublishSubject<String>()
     Observable(just = 1)
         .switchMap { integer ->
@@ -61,40 +77,40 @@ class SwitchMapIntegrationTests {
         }
         .subscribe(testObserver)
 
-    newSource.publish("one")
-    newSource.publish("two")
+    newSource.onNext("one")
+    newSource.onNext("two")
 
     testObserver.assertValues(listOf("1 - one", "1 - two"))
   }
 
   @Test
-  @JsName("givenSwitchedToNewSource_whenSwitchingToNewSeededSource_shouldEmit")
-  fun `given switched to new source, when switching to new seeded source, should emit`() {
+  @JsName("givenSwitchedToNewSeededSource_whenUpstreamEmits_shouldEmit")
+  fun `given switched to new seeded source, when upstream emits, should emit`() {
     val observables = arrayOf(Observable(just = "1"), Observable(just = "2"))
-    val originalSource = BehaviorSubject(seed = 0)
+    val upstream = BehaviorSubject(seed = 0)
 
-    originalSource
+    upstream
         .switchMap { observables[it] }
         .subscribe(testObserver)
 
-    originalSource.publish(1)
+    upstream.onNext(1)
 
     testObserver.assertValues(listOf("1", "2"))
   }
 
   @Test
-  @JsName("givenSubscribedToSwitchMap_andSwitchedFromFirstNewSource_whenOldSourceEmits_shouldNotEmit")
-  fun `given subscribed to switch map and switched from first new source, when old source emits, should not emit`() {
+  @JsName("givenSubscribedToSwitchMap_andSwitchedToSecondNewSource_whenFirstSourceEmits_shouldNotEmit")
+  fun `given subscribed to switchmap and switched to second new source, when first source emits, should not emit`() {
     val sourceOne = PublishSubject<String>()
     val observables = arrayOf(sourceOne, Observable<String>())
-    val originalSource = BehaviorSubject(seed = 0)
+    val upstream = BehaviorSubject(seed = 0)
 
-    originalSource
+    upstream
         .switchMap { observables[it] }
         .subscribe(testObserver)
 
-    originalSource.publish(1)
-    sourceOne.publish("2")
+    upstream.onNext(1)
+    sourceOne.onNext("2")
 
     testObserver.assertNoEmission()
   }
@@ -124,13 +140,13 @@ class SwitchMapIntegrationTests {
   }
 
   @Test
-  @JsName("givenSubscribedToFlatMap_whenTheSourceDisposes_shouldNotify")
-  fun `given subscribed to flatMap, when the source disposes, should notify`() {
+  @JsName("givenSubscribedToFlatMap_whenTheSourceCompletes_shouldNotify")
+  fun `given subscribed to flatmap, when the source completes, should notify`() {
     val source = PublishSubject<String>()
     source.switchMap { Observable(just = it) }
         .subscribe(testObserver)
 
-    source.dispose()
+    source.onComplete()
 
     testObserver.assertValues(emptyList())
     testObserver.assertDisposed()
@@ -148,8 +164,8 @@ class SwitchMapIntegrationTests {
   }
 
   @Test
-  @JsName("givenSourceEmitted_andNewSourceCompleted_whenSubscribing_shouldNotify")
-  fun `given source emitted and new source completed, when subscribing, should notify`() {
+  @JsName("givenSourceEmittedAndCompleted_whenNewSourceCompleted_shouldNotify")
+  fun `given source emitted and completed, when new source completed, should notify`() {
     Observable(just = 1)
         .switchMap { Observable<String>(completeOnSubscribe = true) }
         .subscribe(testObserver)
@@ -158,53 +174,59 @@ class SwitchMapIntegrationTests {
   }
 
   @Test
-  @JsName("givenSubscribedToSwitchMap_whenAllDisposed_shouldNotify")
-  fun `given subscribed to switchMap, when all disposed, should notify`() {
-    Observable<String>()
-        .switchMap { Observable<String>() }
-        .subscribe(testObserver)
+  @JsName("givenSubscribedToSwitchMapAndNoSwitchOccurred_whenAllDisposed_shouldCompleteSwitchMap")
+  fun `given subscribed to switchmap and no switch occurred, when all disposed, should complete switchmap`() {
+    val switchMap = Observable<String>().switchMap { Observable<String>() }
+
+    switchMap
+        .subscribe(TestObserver())
         .dispose()
 
-    testObserver.assertDisposed()
+    switchMap.subscribe(testObserver)
+
+    testObserver.assertComplete()
   }
 
-
   @Test
-  @JsName("givenSubscribedToSwitchMap_whenAllDisposed_shouldDisposeUpstream")
-  fun `given subscribed to switchMap from cold upstream, when all disposed, should dispose upstream`() {
-    lateinit var emitter: Emitter<String>
-    val upstream = Observable<String>(createWithEmitter = {
-      emitter = it
-      Disposables.empty()
-    })
-
-    upstream
-        .switchMap { Observable<String>() }
-        .subscribe(NextObserver {})
+  @JsName("givenSubscribedToSwitchMapAndNoSwitchOccurred_whenAllDisposed_shouldCompleteUpstream")
+  fun `given subscribed to switchmap and no switch occurred, when all disposed, should complete upstream`() {
+    val upstream = Observable<String>()
+    upstream.switchMap { Observable<String>() }
+        .subscribe(TestObserver())
         .dispose()
 
     upstream.subscribe(testObserver)
-    emitter.next("already disposed")
 
-    testObserver.assertNoEmission()
+    testObserver.assertComplete()
   }
 
   @Test
-  @JsName("givenSubscribedToSwitchMapOfNewColdSource_andOriginalSourceEmitted_whenAllDisposed_shouldDisposeNewSource")
-  fun `given subscribed to switchMap of new cold source and original source emitted, when all disposed, should dispose new source`() {
-    lateinit var emitter: Emitter<String>
-    val newSource = Observable<String>(createWithEmitter = {
-      emitter = it
-      Disposables.empty()
-    })
+  @JsName("givenSubscribedToSwitchMap_andEmissionOccurred_whenAllDisposed_shouldCompleteUpstream")
+  fun `given subscribed to switchmap and emission occurred, when all disposed, should complete upstream`() {
+    val upstream = Observable(just = 1)
+
+    upstream.switchMap { Observable<String>() }
+        .subscribe(NextObserver {})
+        .dispose()
+
+    val testUpstreamObserver = TestObserver<Int>()
+
+    upstream.subscribe(testUpstreamObserver)
+
+    testUpstreamObserver.assertComplete()
+  }
+
+  @Test
+  @JsName("givenSubscribedToSwitchMapOfNewColdSource_andUpstreamEmitted_whenAllDisposed_shouldCompleteNewSource")
+  fun `given subscribed to switchmap of new cold source and upstream emitted, when all disposed, should complete new source`() {
+    val newSource = Observable<String>()
     Observable(just = "original")
         .switchMap { newSource }
         .subscribe(NextObserver {})
         .dispose()
 
     newSource.subscribe(testObserver)
-    emitter.next("already disposed")
 
-    testObserver.assertNoEmission()
+    testObserver.assertComplete()
   }
 }

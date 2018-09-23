@@ -1,6 +1,5 @@
 package com.noheltcj.rxcommon.utility
 
-import com.noheltcj.rxcommon.Source
 import com.noheltcj.rxcommon.observers.Observer
 import kotlin.test.*
 
@@ -58,8 +57,8 @@ class TestObserver<E> : Observer<E> {
    * This method will fail the test if the source has not sent the the expected notification matching [error].
    */
   fun assertTerminated(error: Throwable) {
-    assertNotNull(error, "expected the source to be terminated with $error, but it has not terminated.")
-    assertEquals(error, this.error, "expected source to be terminated with $error, but was ${this.error}")
+    assertNotNull(error, "expected the source to be terminated.")
+    assertEquals(error, this.error, "expected source to be terminated.")
   }
 
   /**
@@ -92,19 +91,19 @@ class TestObserver<E> : Observer<E> {
   /**
    * Asserts that the source has been disposed.
    *
-   * This method will fail the test if the source has not sent the dispose notification.
+   * This method will fail the test if the source has not sent the complete or terminate notification.
    */
   fun assertDisposed() {
-    assertTrue(disposed, "expected the source to have sent the dispose notification.")
+    assertTrue(disposed, "expected the source to have sent a complete or terminate notification.")
   }
 
   /**
    * Asserts that the source has not been disposed.
    *
-   * This method will fail the test if the source has sent the dispose notification.
+   * This method will fail the test if the source has sent sent the complete or terminate notification.
    */
   fun assertNotDisposed() {
-    assertFalse(disposed, "expected the source to have never sent the dispose notification.")
+    assertFalse(disposed, "expected the source to have never terminated or completed.")
   }
 
   /**
@@ -119,6 +118,7 @@ class TestObserver<E> : Observer<E> {
    */
   override fun onError(throwable: Throwable) {
     error = throwable
+    disposed = true
   }
 
   /**
@@ -126,12 +126,6 @@ class TestObserver<E> : Observer<E> {
    */
   override fun onComplete() {
     completed = true
-  }
-
-  /**
-   * Called when the source sends the disposed notification. It is not recommended to call this in a test.
-   */
-  override fun onDispose() {
     disposed = true
   }
 }

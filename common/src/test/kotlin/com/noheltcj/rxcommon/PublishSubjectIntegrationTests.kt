@@ -7,7 +7,7 @@ import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class PublishSubjectIntegration {
+class PublishSubjectIntegrationTests {
   lateinit var testObserver: TestObserver<String>
 
   @BeforeTest
@@ -29,7 +29,7 @@ class PublishSubjectIntegration {
   fun `given subscribed, when a new value published, should emit new value`() {
     PublishSubject<String>().apply {
       subscribe(testObserver)
-      publish("2")
+      onNext("2")
     }
     testObserver.assertValue("2")
   }
@@ -38,7 +38,7 @@ class PublishSubjectIntegration {
   @JsName("givenNotSubscribed_andAValuePublished_whenSubscribing_shouldNotEmit")
   fun `given not subscribed and a value was published, when subscribing, should not emit`() {
     PublishSubject<String>().apply {
-      publish("2")
+      onNext("2")
       subscribe(testObserver)
     }
     testObserver.assertNoEmission()
@@ -55,23 +55,61 @@ class PublishSubjectIntegration {
   }
 
   @Test
-  @JsName("givenUpstreamHasCompleted_whenSubscribing_shouldNotify")
-  fun `given upstream has completed, when subscribing, should notify`() {
+  @JsName("givenSubscribedWithUpstream_whenUpstreamCompletes_shouldNotify")
+  fun `given subscribed with upstream, when upstream completes, should notify`() {
     PublishSubject<String>().apply {
-      subscribeTo(Observable(completeOnSubscribe = true))
       subscribe(testObserver)
+      subscribeTo(Observable(completeOnSubscribe = true))
     }
+
     testObserver.assertComplete()
   }
 
   @Test
-  @JsName("givenUpstreamHasTerminated_whenSubscribing_shouldNotify")
-  fun `given upstream has terminated, when subscribing, should notify`() {
+  @JsName("givenSubscribedWithUpstream_whenUpstreamTerminates_shouldNotify")
+  fun `given subscribed with upstream, when upstream terminates, should notify`() {
     val expectedThrowable = Throwable("POW!")
     PublishSubject<String>().apply {
-      subscribeTo(Observable(error = expectedThrowable))
       subscribe(testObserver)
+      subscribeTo(Observable(error = expectedThrowable))
     }
+
     testObserver.assertTerminated(expectedThrowable)
+  }
+
+  @Test
+  @JsName("givenSubscribed_whenCompleted_shouldNotify")
+  fun `given subscribed, when completed, should notify`() {
+    PublishSubject<String>().apply {
+      subscribe(testObserver)
+    }.onComplete()
+
+    testObserver.assertComplete()
+  }
+
+  @Test
+  @JsName("givenSubscribedToColdUpstreamSource_whenCompleted_shouldDisposeUpstream")
+  fun `given subscribed to cold upstream source, when completed, should dispose upstream`() {
+    val upstream = Observable<String>()
+    PublishSubject<String>().apply {
+      subscribeTo(upstream)
+    }.onComplete()
+
+    upstream.subscribe(testObserver)
+
+    testObserver.assertComplete()
+  }
+
+  @Test
+  @JsName("givenSubscribedToColdUpstreamSource_whenTerminated_shouldDisposeUpstream")
+  fun `given subscribed to cold upstream source, when terminated, should dispose upstream`() {
+    val upstream = Observable<String>()
+    PublishSubject<String>().apply {
+      subscribeTo(upstream)
+    }.onError(Throwable())
+
+    upstream.subscribe(testObserver)
+
+    testObserver.assertComplete()
   }
 }
