@@ -5,8 +5,6 @@ import com.noheltcj.rxcommon.disposables.CompositeDisposeBag
 import com.noheltcj.rxcommon.disposables.Disposable
 import com.noheltcj.rxcommon.disposables.Disposables
 import com.noheltcj.rxcommon.emitters.Emitter
-import com.noheltcj.rxcommon.observers.AbstractObserver
-import com.noheltcj.rxcommon.observers.AllObserver
 import com.noheltcj.rxcommon.observers.Observer
 
 abstract class Subject<E> : Observer<E>, Source<E> {

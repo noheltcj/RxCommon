@@ -1,7 +1,6 @@
 package com.noheltcj.rxcommon.operators
 
 import com.noheltcj.rxcommon.Source
-import com.noheltcj.rxcommon.disposables.Disposable
 import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observers.Observer
 

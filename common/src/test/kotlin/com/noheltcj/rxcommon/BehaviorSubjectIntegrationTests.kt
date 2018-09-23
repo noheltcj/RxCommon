@@ -1,15 +1,11 @@
 package com.noheltcj.rxcommon
 
-import com.noheltcj.rxcommon.disposables.Disposables
-import com.noheltcj.rxcommon.emitters.Emitter
-import com.noheltcj.rxcommon.exceptions.UndeliverableEmissionException
 import com.noheltcj.rxcommon.observables.Observable
 import com.noheltcj.rxcommon.subjects.BehaviorSubject
 import com.noheltcj.rxcommon.utility.JsName
 import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertNotNull
 
 class BehaviorSubjectIntegrationTests {
   lateinit var testObserver: TestObserver<String>
