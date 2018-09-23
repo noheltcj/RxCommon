@@ -17,8 +17,8 @@ class ColdEmitterTests {
   }
 
   @Test
-  @JsName("givenObserver_whenNext_shouldEmitToObserver")
-  fun `given observer, when next called, should emit to observer`() {
+  @JsName("givenObserver_whenNext_shouldEmit")
+  fun `given observer, when next, should emit`() {
     emitter.addObserver(testObserver)
 
     emitter.next(1)
@@ -88,7 +88,7 @@ class ColdEmitterTests {
 
   @Test
   @JsName("givenObserverAndTerminated_whenTerminatedAgain_shouldDoNothing")
-  fun `given observer and terminated, when terminated again, should throw`() {
+  fun `given observer and terminated, when terminated again, should do nothing`() {
     val expectedThrowable = Throwable("crackle")
     emitter.addObserver(testObserver)
     emitter.terminate(expectedThrowable)
@@ -173,23 +173,13 @@ class ColdEmitterTests {
   }
 
   @Test
-  @JsName("givenCompletedFromRemovingObservers_whenObserverAdded_shouldNotify")
-  fun `given completed from removing observers, when observer added, should notify`() {
+  @JsName("givenCompletedByRemovingObservers_whenObserverAdded_shouldNotify")
+  fun `given completed by removing observers, when observer added, should notify`() {
     val emptyObserver = NextObserver<Int> {}
     emitter.addObserver(emptyObserver)
     emitter.removeObserver(emptyObserver)
     emitter.addObserver(testObserver)
 
     testObserver.assertComplete()
-  }
-
-  @Test
-  @JsName("givenObserverAddedAndRemoved_whenAddingAnotherObserver_shouldBeCompleted")
-  fun `given observer added and removed, when adding another observer, should be completed`() {
-    val emptyObserver = NextObserver<Int> {}
-    emitter.addObserver(emptyObserver)
-    emitter.removeObserver(emptyObserver)
-
-    assertTrue(emitter.isCompleted)
   }
 }

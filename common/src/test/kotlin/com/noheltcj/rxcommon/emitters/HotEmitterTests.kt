@@ -17,8 +17,8 @@ class HotEmitterTests {
   }
 
   @Test
-  @JsName("givenObserver_whenNext_shouldEmitToObserver")
-  fun `given observer, when next called, should emit to observer`() {
+  @JsName("givenObserver_whenNext_shouldEmit")
+  fun `given observer, when next, should emit`() {
     emitter.addObserver(testObserver)
 
     emitter.next(1)
@@ -66,8 +66,8 @@ class HotEmitterTests {
   }
 
   @Test
-  @JsName("givenObserver_whenTerminated_shouldNotifyObserver")
-  fun `given observer, when terminated, should notify observer`() {
+  @JsName("givenObserver_whenTerminated_shouldNotify")
+  fun `given observer, when terminated, should notify`() {
     val expectedThrowable = Throwable("pop")
     emitter.addObserver(testObserver)
 
@@ -77,8 +77,8 @@ class HotEmitterTests {
   }
 
   @Test
-  @JsName("givenObserver_whenCompleted_shouldNotifyObserver")
-  fun `given observer, when completed, should notify observer`() {
+  @JsName("givenObserver_whenCompleted_shouldNotify")
+  fun `given observer, when completed, should notify`() {
     emitter.addObserver(testObserver)
 
     emitter.complete()
@@ -88,7 +88,7 @@ class HotEmitterTests {
 
   @Test
   @JsName("givenObserverAndTerminated_whenTerminatedAgain_shouldDoNothing")
-  fun `given observer and terminated, when terminated again, should throw`() {
+  fun `given observer and terminated, when terminated again, should do nothing`() {
     val expectedThrowable = Throwable("crackle")
     emitter.addObserver(testObserver)
     emitter.terminate(expectedThrowable)
