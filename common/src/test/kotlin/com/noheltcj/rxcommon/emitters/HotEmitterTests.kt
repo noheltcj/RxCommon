@@ -135,7 +135,7 @@ class HotEmitterTests {
   }
 
   @Test
-  @JsName("givenObserverAddedAndRemoved_whenAddingAnotherObserver_shouldBeCompleted")
+  @JsName("givenObserverAddedAndRemoved_whenAddingAnotherObserver_shouldNotBeCompleted")
   fun `given observer added and removed, when adding another observer, should not be completed`() {
     val emptyObserver = NextObserver<Int> {}
     emitter.addObserver(emptyObserver)
