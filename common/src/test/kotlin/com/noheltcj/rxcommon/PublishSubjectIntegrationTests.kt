@@ -58,37 +58,26 @@ class PublishSubjectIntegrationTests {
   }
 
   @Test
-  @JsName("givenUpstreamHasCompleted_whenSubscribing_shouldNotify")
-  fun `given upstream has completed, when subscribing, should notify`() {
+  @JsName("givenSubscribedWithUpstream_whenUpstreamCompletes_shouldNotify")
+  fun `given subscribed with upstream, when upstream completes, should notify`() {
     PublishSubject<String>().apply {
-      subscribeTo(Observable(completeOnSubscribe = true))
       subscribe(testObserver)
+      subscribeTo(Observable(completeOnSubscribe = true))
     }
+
     testObserver.assertComplete()
   }
 
   @Test
-  @JsName("givenUpstreamHasTerminated_whenSubscribing_shouldNotify")
-  fun `given upstream has terminated, when subscribing, should notify`() {
+  @JsName("givenSubscribedWithUpstream_whenUpstreamTerminates_shouldNotify")
+  fun `given subscribed with upstream, when upstream terminates, should notify`() {
     val expectedThrowable = Throwable("POW!")
     PublishSubject<String>().apply {
+      subscribe(testObserver)
       subscribeTo(Observable(error = expectedThrowable))
-      subscribe(testObserver)
     }
+
     testObserver.assertTerminated(expectedThrowable)
-  }
-
-  @Test
-  @JsName("givenSubscribedToUpstreamSource_whenUpstreamSourceDisposes_shouldNotify")
-  fun `given subscribed to upstream source, when upstream source disposes, should notify`() {
-    val upstream = PublishSubject<String>()
-    PublishSubject<String>().apply {
-      subscribeTo(upstream)
-      subscribe(testObserver)
-    }
-    upstream.onComplete()
-
-    testObserver.assertComplete()
   }
 
   @Test
@@ -102,20 +91,28 @@ class PublishSubjectIntegrationTests {
   }
 
   @Test
-  @JsName("givenSubscribedToColdUpstreamSource_whenDisposed_shouldDisposeUpstream")
-  fun `given subscribed to cold upstream source, when disposed, should dispose upstream`() {
-    lateinit var upstreamEmitter: Emitter<String>
-    val upstream = Observable<String>(createWithEmitter = {
-      upstreamEmitter = it
-      Disposables.empty()
-    })
+  @JsName("givenSubscribedToColdUpstreamSource_whenCompleted_shouldDisposeUpstream")
+  fun `given subscribed to cold upstream source, when completed, should dispose upstream`() {
+    val upstream = Observable<String>()
     PublishSubject<String>().apply {
       subscribeTo(upstream)
     }.onComplete()
+
     upstream.subscribe(testObserver)
 
-    upstreamEmitter.next("already disposed")
+    testObserver.assertComplete()
+  }
 
-    testObserver.assertNoEmission()
+  @Test
+  @JsName("givenSubscribedToColdUpstreamSource_whenTerminated_shouldDisposeUpstream")
+  fun `given subscribed to cold upstream source, when terminated, should dispose upstream`() {
+    val upstream = Observable<String>()
+    PublishSubject<String>().apply {
+      subscribeTo(upstream)
+    }.onError(Throwable())
+
+    upstream.subscribe(testObserver)
+
+    testObserver.assertComplete()
   }
 }

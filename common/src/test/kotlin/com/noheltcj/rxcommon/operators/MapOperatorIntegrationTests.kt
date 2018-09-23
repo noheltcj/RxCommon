@@ -1,7 +1,5 @@
 package com.noheltcj.rxcommon.operators
 
-import com.noheltcj.rxcommon.disposables.Disposables
-import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observables.Observable
 import com.noheltcj.rxcommon.observers.NextObserver
 import com.noheltcj.rxcommon.subjects.PublishSubject
@@ -9,7 +7,6 @@ import com.noheltcj.rxcommon.utility.JsName
 import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertTrue
 
 class MapOperatorIntegrationTests {
   lateinit var testObserver: TestObserver<String>
@@ -73,11 +70,7 @@ class MapOperatorIntegrationTests {
   @Test
   @JsName("givenColdSourceMapped_whenOnlyObserverDisposed_shouldDisposeSource")
   fun `given cold source mapped, when the only observer disposed, should dispose source`() {
-    lateinit var sourceEmitter: Emitter<Int>
-    val source = Observable<Int>(createWithEmitter = {
-      sourceEmitter = it
-      Disposables.empty()
-    })
+    val source = Observable<Int>()
     source.map { it.toString() }
         .subscribe(testObserver)
         .dispose()

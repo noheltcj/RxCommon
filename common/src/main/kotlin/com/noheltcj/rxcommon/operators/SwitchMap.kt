@@ -19,6 +19,8 @@ class SwitchMap<E, U>(
   override val emitter: Emitter<E> = ColdEmitter()
 
   private var currentSecondaryDisposable: Disposable? = null
+  private var sourceCompleted = false
+  private var newSourceCompleted = true
 
   override fun subscribe(observer: Observer<E>): Disposable {
     emitter.addObserver(observer)
@@ -26,12 +28,20 @@ class SwitchMap<E, U>(
     val upstreamDisposable = upstream.subscribe(
         AllObserver(
           onNext = {
+            newSourceCompleted = false
             val tempDisposable = resolveNewSource(it).subscribe(this)
             currentSecondaryDisposable?.dispose()
             currentSecondaryDisposable = tempDisposable
           },
-          onError = { emitter.terminate(it) },
-          onComplete = { emitter.complete() }
+          onError = {
+            currentSecondaryDisposable?.dispose()
+            emitter.terminate(it)
+          },
+          onComplete = {
+            sourceCompleted = true
+            if(newSourceCompleted)
+              emitter.complete()
+          }
         )
     )
 
@@ -40,5 +50,11 @@ class SwitchMap<E, U>(
       currentSecondaryDisposable?.dispose()
       emitter.removeObserver(observer)
     }
+  }
+
+  override fun onComplete() {
+    newSourceCompleted = true
+    if (sourceCompleted)
+      super.onComplete()
   }
 }

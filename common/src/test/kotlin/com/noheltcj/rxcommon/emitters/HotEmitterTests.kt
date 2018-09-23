@@ -1,8 +1,6 @@
 package com.noheltcj.rxcommon.emitters
 
-import com.noheltcj.rxcommon.exceptions.UndeliverableCompletionException
 import com.noheltcj.rxcommon.exceptions.UndeliverableEmissionException
-import com.noheltcj.rxcommon.exceptions.UndeliverableTerminationException
 import com.noheltcj.rxcommon.observers.NextObserver
 import com.noheltcj.rxcommon.utility.JsName
 import com.noheltcj.rxcommon.utility.TestObserver
@@ -79,44 +77,6 @@ class HotEmitterTests {
   }
 
   @Test
-  @JsName("givenObserverAndTerminated_whenTerminated_shouldThrow")
-  fun `given observer and terminated, when terminated again, should throw`() {
-    val expectedThrowable = Throwable("crackle")
-    emitter.addObserver(testObserver)
-    emitter.terminate(expectedThrowable)
-
-    var capturedException: UndeliverableTerminationException? = null
-    try {
-      emitter.terminate(Throwable("hiss"))
-    } catch (e: UndeliverableTerminationException) {
-      capturedException = e
-    }
-
-    assertNotNull(capturedException)
-    assertEquals("hiss", capturedException!!.undeliverableTerminalError.message)
-    testObserver.assertTerminated(expectedThrowable)
-  }
-
-  @Test
-  @JsName("givenObserverAndCompleted_whenTerminated_shouldNotNotifyObserver")
-  fun `given observer and completed, when terminated, should not notify observer`() {
-    emitter.addObserver(testObserver)
-    emitter.complete()
-
-    var capturedException: UndeliverableTerminationException? = null
-    try {
-      emitter.terminate(Throwable("hiss"))
-    } catch (e: UndeliverableTerminationException) {
-      capturedException = e
-    }
-
-    assertNotNull(capturedException)
-    assertEquals("hiss", capturedException!!.undeliverableTerminalError.message)
-    testObserver.assertNotTerminated()
-    testObserver.assertComplete()
-  }
-
-  @Test
   @JsName("givenObserver_whenCompleted_shouldNotifyObserver")
   fun `given observer, when completed, should notify observer`() {
     emitter.addObserver(testObserver)
@@ -127,40 +87,51 @@ class HotEmitterTests {
   }
 
   @Test
-  @JsName("givenObserverAndTerminated_whenCompleted_shouldThrow")
-  fun `given observer and terminated, when completed, should throw`() {
+  @JsName("givenObserverAndTerminated_whenTerminatedAgain_shouldDoNothing")
+  fun `given observer and terminated, when terminated again, should throw`() {
+    val expectedThrowable = Throwable("crackle")
+    emitter.addObserver(testObserver)
+    emitter.terminate(expectedThrowable)
+
+    emitter.terminate(Throwable("hiss"))
+
+    testObserver.assertTerminated(expectedThrowable)
+  }
+
+  @Test
+  @JsName("givenObserverAndTerminated_whenCompleted_shouldDoNothing")
+  fun `given observer and terminated, when completed, should do nothing`() {
     val expectedThrowable = Throwable("expected")
     emitter.addObserver(testObserver)
     emitter.terminate(expectedThrowable)
 
-    var capturedException: UndeliverableCompletionException? = null
-    try {
-      emitter.complete()
-    } catch (e: UndeliverableCompletionException) {
-      capturedException = e
-    }
+    emitter.complete()
 
-    assertNotNull(capturedException)
     testObserver.assertNotComplete()
     testObserver.assertTerminated(expectedThrowable)
   }
 
-
   @Test
-  @JsName("givenObserverAndCompleted_whenCompletedAgain_shouldThrow")
-  fun `given observer and completed, when completed again, should throw`() {
+  @JsName("givenObserverAndCompleted_whenCompletedAgain_shouldDoNothing")
+  fun `given observer and completed, when completed again, should do nothing`() {
     emitter.addObserver(testObserver)
     emitter.complete()
 
-    var capturedException: UndeliverableCompletionException? = null
-    try {
-      emitter.complete()
-    } catch (e: UndeliverableCompletionException) {
-      capturedException = e
-    }
+    emitter.complete()
 
-    assertNotNull(capturedException)
     testObserver.assertComplete()
+  }
+
+  @Test
+  @JsName("givenObserverAndCompleted_whenTerminated_shouldDoNothing")
+  fun `given observer and completed, when terminated, should do nothing`() {
+    emitter.addObserver(testObserver)
+    emitter.complete()
+
+    emitter.terminate(Throwable())
+
+    testObserver.assertComplete()
+    testObserver.assertNotTerminated()
   }
 
   @Test

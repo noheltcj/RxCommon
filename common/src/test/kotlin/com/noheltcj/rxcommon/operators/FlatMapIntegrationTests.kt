@@ -1,7 +1,5 @@
 package com.noheltcj.rxcommon.operators
 
-import com.noheltcj.rxcommon.disposables.Disposables
-import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observables.Observable
 import com.noheltcj.rxcommon.observers.NextObserver
 import com.noheltcj.rxcommon.subjects.BehaviorSubject
@@ -30,8 +28,8 @@ class FlatMapIntegrationTests {
   }
 
   @Test
-  @JsName("givenSubscribedToFlatMappedSource_whenUpstreamEmits_shouldNotEmit")
-  fun `given subscribed to flatMapped source, when upstream emits, should not emit`() {
+  @JsName("givenSubscribedToFlatMappedEmptySource_whenUpstreamEmits_shouldNotEmit")
+  fun `given subscribed to flatMapped empty source, when upstream emits, should not emit`() {
     val source = PublishSubject<Int>()
     source.flatMap { Observable<String>() }
         .subscribe(testObserver)
@@ -117,23 +115,105 @@ class FlatMapIntegrationTests {
   @JsName("givenUpstreamSourceCompleted_whenSubscribing_shouldNotify")
   fun `given upstream source completed, when subscribing, should notify`() {
     Observable<String>(completeOnSubscribe = true)
-        .flatMap { Observable(just = it) }
+        .flatMap { Observable<String>() }
         .subscribe(testObserver)
 
-    testObserver.assertValues(emptyList())
     testObserver.assertComplete()
   }
 
   @Test
-  @JsName("givenSubscribedToFlatMap_whenTheSourceCompletes_shouldNotify")
-  fun `given subscribed to flatMap, when the source completes, should notify`() {
+  @JsName("givenUpstreamSourceEmitted_andUpstreamIsNotComplete_whenNewSourceCompletes_shouldNotNotify")
+  fun `given upstream source emitted and upstream is not complete, when the new source completes, should not notify`() {
     val source = PublishSubject<String>()
+
     source.flatMap { Observable(just = it) }
         .subscribe(testObserver)
 
+    source.onNext("1")
+
+    testObserver.assertValue("1")
+    testObserver.assertNotComplete()
+  }
+
+  @Test
+  @JsName("givenUpstreamSourceEmitted_andUpstreamIsComplete_whenNewSourceCompletes_shouldNotify")
+  fun `given upstream source emitted and upstream is complete, when the new source completes, should notify`() {
+    val newSource = PublishSubject<String>()
+
+    Observable(just = 1).flatMap { newSource }
+        .subscribe(testObserver)
+
+    newSource.onComplete()
+
+    testObserver.assertComplete()
+  }
+
+  @Test
+  @JsName("givenUpstreamSourceEmitted_andNewSourceNotCompleted_whenTheUpstreamCompletes_shouldNotNotify")
+  fun `given upstream source emitted and new source not completed, when the upstream completes, should not notify`() {
+    val source = PublishSubject<Int>()
+
+    source.flatMap { Observable<String>() }
+        .subscribe(testObserver)
+
+    source.onNext(1)
     source.onComplete()
 
-    testObserver.assertValues(emptyList())
+    testObserver.assertNotComplete()
+  }
+
+  @Test
+  @JsName("givenUpstreamSourceEmitted_andFirstNewSourceCompleted_andSecondNewSourceIncomplete_whenTheUpstreamCompletes_shouldNotNotify")
+  fun `given upstream source emitted and first new source completed and second new source incomplete, when the upstream completes, should not notify`() {
+    val source = PublishSubject<Int>()
+
+    source.flatMap {
+      when(it) {
+        1 -> Observable<String>(completeOnSubscribe = true)
+        else -> Observable()
+      }
+    }.subscribe(testObserver)
+
+    source.onNext(1)
+    source.onNext(2)
+    source.onComplete()
+
+    testObserver.assertNotComplete()
+  }
+
+  @Test
+  @JsName("givenUpstreamSourceEmitted_andMultipleNewSourcesCompleted_whenUpstreamCompletes_shouldNotify")
+  fun `given upstream source emitted and multiple new sources completed, when the upstream completes, should notify`() {
+    val source = PublishSubject<Int>()
+
+    source.flatMap { Observable<String>(completeOnSubscribe = true) }
+        .subscribe(testObserver)
+
+    source.onNext(1)
+    source.onNext(2)
+    source.onComplete()
+
+    testObserver.assertComplete()
+  }
+
+  @Test
+  @JsName("givenMultipleIncompleteSourcesFlatMapped_andUpstreamCompleted_whenNewSourcesComplete_shouldNotify")
+  fun `given multiple incomplete sources flatmapped and upstream completed, when flatmapped sources complete, should notify`() {
+    val source = PublishSubject<Int>()
+    val flatmappedSources = mutableListOf<PublishSubject<String>>()
+
+    source.flatMap {
+      PublishSubject<String>().also {
+        flatmappedSources.add(it)
+      }
+    }.subscribe(testObserver)
+
+    source.onNext(1)
+    source.onNext(2)
+    source.onComplete()
+
+    flatmappedSources.forEach(PublishSubject<String>::onComplete)
+
     testObserver.assertComplete()
   }
 
@@ -141,34 +221,12 @@ class FlatMapIntegrationTests {
   @JsName("givenSourceEmitted_andNewSourceTerminated_whenSubscribing_shouldNotify")
   fun `given source emitted and new source terminated, when subscribing, should notify`() {
     val expectedThrowable = Throwable("flatMap error")
+
     Observable(just = 1)
         .flatMap { Observable<String>(error = expectedThrowable) }
         .subscribe(testObserver)
 
     testObserver.assertTerminated(expectedThrowable)
-  }
-
-  @Test
-  @JsName("givenSourceEmitted_andNewSourceCompleted_whenSubscribing_shouldNotify")
-  fun `given source emitted and new source completed, when subscribing, should notify`() {
-    Observable(just = 1)
-        .flatMap { Observable<String>(completeOnSubscribe = true) }
-        .subscribe(testObserver)
-
-    testObserver.assertComplete()
-  }
-
-  @Test
-  @JsName("givenSubscribedToFlatMapAndOriginalSourceEmitted_whenNewSourceCompleted_shouldNotify")
-  fun `given subscribed to flatMap and original source emitted, when new source completed, should notify`() {
-    val newSource = PublishSubject<String>()
-    Observable(just = 1)
-        .flatMap { newSource }
-        .subscribe(testObserver)
-
-    newSource.onComplete()
-
-    testObserver.assertComplete()
   }
 
   @Test
@@ -201,11 +259,7 @@ class FlatMapIntegrationTests {
   @Test
   @JsName("givenSubscribedToFlatMapOfNewColdSource_andOriginalSourceEmitted_whenAllDisposed_shouldCompleteNewSource")
   fun `given subscribed to flatMap of new cold source and original source emitted, when all disposed, should dispose new source`() {
-    lateinit var emitter: Emitter<String>
-    val newSource = Observable<String>(createWithEmitter = {
-      emitter = it
-      Disposables.empty()
-    })
+    val newSource = Observable<String>()
     Observable(just = "original")
         .flatMap { newSource }
         .subscribe(NextObserver {})

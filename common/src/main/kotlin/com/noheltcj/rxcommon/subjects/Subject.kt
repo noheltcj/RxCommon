@@ -6,9 +6,10 @@ import com.noheltcj.rxcommon.disposables.Disposable
 import com.noheltcj.rxcommon.disposables.Disposables
 import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observers.AbstractObserver
+import com.noheltcj.rxcommon.observers.AllObserver
 import com.noheltcj.rxcommon.observers.Observer
 
-abstract class Subject<E> : Observer<E>, Source<E>/*, Disposable*/ {
+abstract class Subject<E> : Observer<E>, Source<E> {
   protected abstract val emitter : Emitter<E>
 
   private val disposeBag = CompositeDisposeBag()
@@ -26,10 +27,8 @@ abstract class Subject<E> : Observer<E>, Source<E>/*, Disposable*/ {
   }
 
   override fun onComplete() {
-    if (!emitter.isDisposed) {
-      emitter.complete()
-      disposeBag.dispose()
-    }
+    emitter.complete()
+    disposeBag.dispose()
   }
 
   override fun onError(throwable: Throwable) {

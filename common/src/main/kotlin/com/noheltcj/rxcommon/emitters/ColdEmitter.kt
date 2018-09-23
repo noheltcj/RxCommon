@@ -1,8 +1,6 @@
 package com.noheltcj.rxcommon.emitters
 
-import com.noheltcj.rxcommon.exceptions.UndeliverableCompletionException
 import com.noheltcj.rxcommon.exceptions.UndeliverableEmissionException
-import com.noheltcj.rxcommon.exceptions.UndeliverableTerminationException
 import com.noheltcj.rxcommon.observers.Observer
 
 class ColdEmitter<E> : Emitter<E> {
@@ -48,8 +46,6 @@ class ColdEmitter<E> : Emitter<E> {
       terminalError = throwable
       activeObservers.forEach { it.onError(throwable) }
       dispose()
-    } else {
-      throw UndeliverableTerminationException(throwable)
     }
   }
 
@@ -58,8 +54,6 @@ class ColdEmitter<E> : Emitter<E> {
       isCompleted = true
       activeObservers.forEach { it.onComplete() }
       dispose()
-    } else {
-      throw UndeliverableCompletionException()
     }
   }
 
