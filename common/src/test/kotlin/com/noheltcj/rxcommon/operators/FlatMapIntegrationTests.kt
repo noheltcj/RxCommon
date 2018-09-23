@@ -168,7 +168,7 @@ class FlatMapIntegrationTests {
 
     newSource.onComplete()
 
-    testObserver.assertDisposed()
+    testObserver.assertComplete()
   }
 
   @Test
@@ -176,34 +176,30 @@ class FlatMapIntegrationTests {
   fun `given subscribed to flatMap, when all disposed, should notify`() {
     Observable<String>()
         .flatMap { Observable<String>() }
-        .subscribe(testObserver)
-        .dispose()
+        .apply {
+          subscribe(NextObserver {}).dispose()
+          subscribe(testObserver)
+        }
 
-    testObserver.assertDisposed()
+    testObserver.assertComplete()
   }
 
   @Test
   @JsName("givenSubscribedToFlatMap_whenAllDisposed_shouldDisposeUpstream")
   fun `given subscribed to flatMap from cold upstream, when all disposed, should dispose upstream`() {
-    lateinit var emitter: Emitter<String>
-    val upstream = Observable<String>(createWithEmitter = {
-      emitter = it
-      Disposables.empty()
-    })
-
+    val upstream = Observable<String>()
     upstream
         .flatMap { Observable<String>() }
         .subscribe(NextObserver {})
         .dispose()
 
     upstream.subscribe(testObserver)
-    emitter.next("already disposed")
 
-    testObserver.assertNoEmission()
+    testObserver.assertComplete()
   }
 
   @Test
-  @JsName("givenSubscribedToFlatMapOfNewColdSource_andOriginalSourceEmitted_whenAllDisposed_shouldDisposeNewSource")
+  @JsName("givenSubscribedToFlatMapOfNewColdSource_andOriginalSourceEmitted_whenAllDisposed_shouldCompleteNewSource")
   fun `given subscribed to flatMap of new cold source and original source emitted, when all disposed, should dispose new source`() {
     lateinit var emitter: Emitter<String>
     val newSource = Observable<String>(createWithEmitter = {
@@ -216,8 +212,7 @@ class FlatMapIntegrationTests {
         .dispose()
 
     newSource.subscribe(testObserver)
-    emitter.next("already disposed")
 
-    testObserver.assertNoEmission()
+    testObserver.assertComplete()
   }
 }

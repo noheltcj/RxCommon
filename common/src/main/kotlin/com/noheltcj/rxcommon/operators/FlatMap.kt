@@ -13,8 +13,10 @@ class FlatMap<E, U>(
     private val upstream: Source<U>,
     private val resolveAdditionalSource: (U) -> Source<E>
 ) : Operator<E>() {
-
   override val emitter: Emitter<E> = ColdEmitter()
+
+  private var upstreamCompleted = false
+  private var mergedSourceCount = 0
 
   override fun subscribe(observer: Observer<E>): Disposable {
     emitter.addObserver(observer)
@@ -24,16 +26,27 @@ class FlatMap<E, U>(
     disposeBag.add(upstream.subscribe(
         AllObserver(
             onNext = {
+              mergedSourceCount += 1
               disposeBag.add(resolveAdditionalSource(it).subscribe(this))
             },
             onError = { emitter.terminate(it) },
-            onComplete = { emitter.complete() }
+            onComplete = {
+              upstreamCompleted = true
+              if (!emitter.isDisposed && mergedSourceCount == 0) emitter.complete()
+            }
         )
     ))
 
     return Disposables.create {
-      disposeBag.dispose()
       emitter.removeObserver(observer)
+      disposeBag.dispose()
+    }
+  }
+
+  override fun onComplete() {
+    mergedSourceCount--
+    if (upstreamCompleted && mergedSourceCount == 0) {
+      super.onComplete()
     }
   }
 }

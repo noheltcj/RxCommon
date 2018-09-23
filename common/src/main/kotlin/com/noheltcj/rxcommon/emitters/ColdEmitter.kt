@@ -21,15 +21,9 @@ class ColdEmitter<E> : Emitter<E> {
 
   override fun addObserver(observer: Observer<E>) {
     activeObservers.add(observer)
-    if (!released) {
-      release()
-    }
-    if (isDisposed) {
-      activeObservers.clear()
-    }
-    if(isCompleted) {
-      observer.onComplete()
-    }
+    if (!released) release()
+    if (isDisposed) activeObservers.clear()
+    if (isCompleted) observer.onComplete()
   }
 
   override fun removeObserver(observer: Observer<E>) {
@@ -80,9 +74,7 @@ class ColdEmitter<E> : Emitter<E> {
       forwardPressure.forEach { element ->
         observer.onNext(element)
       }
-      if (isCompleted)
-        observer.onComplete()
-      terminalError?.run { observer.onError(this) }
+      terminalError?.also(observer::onError)
     }
   }
 }

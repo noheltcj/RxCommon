@@ -9,6 +9,7 @@ import com.noheltcj.rxcommon.utility.JsName
 import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertTrue
 
 class MapOperatorIntegrationTests {
   lateinit var testObserver: TestObserver<String>
@@ -84,9 +85,7 @@ class MapOperatorIntegrationTests {
     val sourceTestObserver = TestObserver<Int>()
     source.subscribe(sourceTestObserver)
 
-    sourceEmitter.next(1)
-
-    sourceTestObserver.assertNoEmission()
+    sourceTestObserver.assertDisposed()
   }
 
   @Test
@@ -94,14 +93,11 @@ class MapOperatorIntegrationTests {
   fun `given hot source mapped, when the only observer disposed, should dispose operator`() {
     val source = PublishSubject<Int>()
     source.map { it.toString() }.apply {
-      val emptyObserver = NextObserver<String> {}
-      subscribe(emptyObserver).dispose()
+      subscribe(TestObserver()).dispose()
       subscribe(testObserver)
     }
 
-    source.onNext(1)
-
-    testObserver.assertNoEmission()
+    testObserver.assertDisposed()
   }
 
   @Test
