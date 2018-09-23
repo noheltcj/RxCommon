@@ -1,5 +1,5 @@
 plugins {
-    id 'kotlin-platform-jvm' version '1.2.61'
+    id 'kotlin-platform-jvm' version '1.2.70'
 }
 
 dependencies {
