@@ -1,8 +1,8 @@
 buildscript {
     ext {
         project_group_id = 'com.noheltcj'
-        project_version = '0.0.2'
-        kotlin_version = '1.2.60'
+        project_version = '0.1.0'
+        kotlin_version = '1.2.70'
         upload_artifacts = System.getenv("uploadArtifacts") == "true"
     }
 

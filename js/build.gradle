@@ -1,5 +1,5 @@
 plugins {
-    id 'kotlin-platform-js' version '1.2.60'
+    id 'kotlin-platform-js' version '1.2.70'
 }
 
 dependencies {
@@ -9,7 +9,6 @@ dependencies {
 
     testCompile "org.jetbrains.kotlin:kotlin-test-js"
 }
-
 
 group = project_group_id
 version = project_version
