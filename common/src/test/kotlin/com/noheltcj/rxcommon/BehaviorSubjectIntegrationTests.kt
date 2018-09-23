@@ -22,7 +22,9 @@ class BehaviorSubjectIntegrationTests {
   @Test
   @JsName("whenSubscribing_shouldEmitTheSeed")
   fun `when subscribing, should emit the seed`() {
-    BehaviorSubject("seed").subscribe(testObserver)
+    BehaviorSubject("seed")
+        .subscribe(testObserver)
+
     testObserver.assertValue("seed")
   }
 
@@ -45,16 +47,18 @@ class BehaviorSubjectIntegrationTests {
 
       subscribe(testObserver)
     }
+
     testObserver.assertValue("elementTwo")
   }
 
   @Test
-  @JsName("givenUpstreamHasNotEmitted_whenSubscribing_shouldEmitTheSeed")
+  @JsName("givenUpstreamHasNotEmitted_whenSubscribing_shouldEmitSeed")
   fun `given upstream has not emitted, when subscribing, should emit the seed`() {
     BehaviorSubject("seed").apply {
       subscribeTo(Observable())
       subscribe(testObserver)
     }
+
     testObserver.assertValue("seed")
   }
 
@@ -65,28 +69,31 @@ class BehaviorSubjectIntegrationTests {
       subscribeTo(Observable(just = "upstream"))
       subscribe(testObserver)
     }
+
     testObserver.assertValue("upstream")
   }
 
   @Test
-  @JsName("givenSubscribed_whenCompletedUpstreamAdded_shouldEmitSeedAndComplete")
-  fun `given subscribed, when completed upstream added, should emit seed and complete`() {
+  @JsName("givenSubscribed_whenCompletedUpstreamAdded_shouldEmitSeedAndNotify")
+  fun `given subscribed, when completed upstream added, should emit seed and notify`() {
     BehaviorSubject("seed").apply {
       subscribe(testObserver)
       subscribeTo(Observable(completeOnSubscribe = true))
     }
+
     testObserver.assertValue("seed")
     testObserver.assertComplete()
   }
 
   @Test
-  @JsName("givenSubscribed_whenTerminatedUpstreamAdded_shouldEmitSeedAndTerminate")
-  fun `given subscribed, when terminated upstream added, should emit seed and terminate`() {
+  @JsName("givenSubscribed_whenTerminatedUpstreamAdded_shouldEmitSeedAndNotify")
+  fun `given subscribed, when terminated upstream added, should emit seed and notify`() {
     val expectedThrowable = Throwable("POW!")
     BehaviorSubject("seed").apply {
       subscribe(testObserver)
       subscribeTo(Observable(error = expectedThrowable))
     }
+
     testObserver.assertValue("seed")
     testObserver.assertTerminated(expectedThrowable)
   }
@@ -105,7 +112,7 @@ class BehaviorSubjectIntegrationTests {
 
   @Test
   @JsName("givenSubscribed_whenComplete_shouldNotify")
-  fun `given subscribed, when disposed, should notify`() {
+  fun `given subscribed, when completed, should notify`() {
     BehaviorSubject("hello").apply {
       subscribe(testObserver)
     }.onComplete()
@@ -125,25 +132,17 @@ class BehaviorSubjectIntegrationTests {
   }
 
   @Test
-  @JsName("givenOnlyObserverOfColdUpstreamSource_whenCompleted_shouldCompleteUpstream")
-  fun `given subscribed to cold upstream source, when disposed, should dispose upstream`() {
-    lateinit var upstreamEmitter: Emitter<String>
-    val upstream = Observable<String>(createWithEmitter = {
-      upstreamEmitter = it
-      Disposables.empty()
-    })
-    BehaviorSubject("bye").apply {
-      subscribeTo(upstream)
-    }.onComplete()
+  @JsName("givenSubscribedToColdUpstreamSource_whenCompleted_shouldCompleteUpstream")
+  fun `given subscribed to cold upstream source, when completed, should complete upstream`() {
+    val upstream = Observable<String>()
+    val subject = BehaviorSubject("")
 
-    var undeliverableException: UndeliverableEmissionException? = null
-    try {
-      upstreamEmitter.next("already disposed")
-    } catch (e: UndeliverableEmissionException) {
-      undeliverableException = e
-    }
-    assertNotNull(undeliverableException)
+    subject.subscribeTo(upstream)
 
-    testObserver.assertNoEmission()
+    subject.onComplete()
+
+    upstream.subscribe(testObserver)
+
+    testObserver.assertComplete()
   }
 }
