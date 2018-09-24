@@ -13,7 +13,7 @@ class CombineLatest<S1, S2, R>(
     private val sourceTwo: Source<S2>,
     private inline val transform: (S1, S2) -> R
 ) : Source<R> {
-  val emitter: Emitter<R> = ColdEmitter()
+  val emitter: Emitter<R> = ColdEmitter {}
 
   override fun subscribe(observer: Observer<R>): Disposable {
     emitter.addObserver(observer)

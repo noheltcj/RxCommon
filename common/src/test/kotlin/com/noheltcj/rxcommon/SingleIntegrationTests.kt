@@ -1,14 +1,14 @@
 package com.noheltcj.rxcommon
 
 import com.noheltcj.rxcommon.disposables.Disposables
-import com.noheltcj.rxcommon.observables.Observable
+import com.noheltcj.rxcommon.observables.Single
 import com.noheltcj.rxcommon.utility.JsName
 import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-class ObservableIntegrationTests {
+class SingleIntegrationTests {
   private lateinit var testObserver: TestObserver<String>
 
   @BeforeTest
@@ -19,27 +19,28 @@ class ObservableIntegrationTests {
   @Test
   @JsName("givenEmptyConstructorUsed_whenSubscribing_shouldNotEmit")
   fun `given empty constructor used, when subscribing, should not emit`() {
-    Observable<String>().subscribe(testObserver)
+    Single<String>().subscribe(testObserver)
 
     testObserver.assertNoEmission()
   }
 
   @Test
-  @JsName("givenCreateWithEmitterConstructorUsed_andNextEmitted_whenSubscribing_shouldEmitTheValue")
-  fun `given create with emitter constructor used, and next emitted, when subscribing, should emit the value`() {
-    Observable<String> { emitter ->
+  @JsName("givenCreateWithEmitterConstructorUsed_andNextEmitted_whenSubscribing_shouldEmitTheValueAndComplete")
+  fun `given create with emitter constructor used, and next emitted, when subscribing, should emit the value and complete`() {
+    Single<String> { emitter ->
       emitter.next("element")
 
       Disposables.empty()
     }.subscribe(testObserver)
 
     testObserver.assertValue("element")
+    testObserver.assertComplete()
   }
 
   @Test
   @JsName("givenCreateWithEmitterConstructorUsed_andNextEmitted_whenSubscribing_shouldNotBeTerminated")
   fun `given create with emitter constructor used, and next emitted, when subscribing, should not be terminated`() {
-    Observable<String> { emitter ->
+    Single<String> { emitter ->
       emitter.next("element")
 
       Disposables.empty()
@@ -48,25 +49,11 @@ class ObservableIntegrationTests {
     testObserver.assertNotTerminated()
   }
 
-
-  @Test
-  @JsName("givenCreateWithEmitterConstructorUsed_andNextEmitted_whenSubscribing_shouldNotBeComplete")
-  fun `given create with emitter constructor used, and next emitted, when subscribing, should not be complete`() {
-    Observable<String> { emitter ->
-      emitter.next("element")
-
-      Disposables.empty()
-    }.subscribe(testObserver)
-
-    testObserver.assertNotComplete()
-  }
-
-
   @Test
   @JsName("givenCreateWithEmitterConstructorUsed_andTerminateCalled_whenSubscribing_shouldBeTerminated")
   fun `given create with emitter constructor used, and terminate called, when subscribing, should be terminated`() {
     val expectedThrowable = Throwable("boom boom")
-    Observable<String> { emitter ->
+    Single<String> { emitter ->
       emitter.terminate(expectedThrowable)
 
       Disposables.empty()
@@ -80,56 +67,48 @@ class ObservableIntegrationTests {
   fun `given error constructor used, when subscribing, should be terminated`() {
     val expectedError = Throwable("terminal error")
 
-    Observable<String>(error = expectedError).subscribe(testObserver)
+    Single<String>(error = expectedError).subscribe(testObserver)
 
     testObserver.assertTerminated(expectedError)
   }
 
   @Test
-  @JsName("givenCompleteOnSubscribeConstructorUsed_whenSubscribing_shouldNotifyComplete")
-  fun `given complete on subscribe constructor used, when subscribing, should notify complete`() {
-    Observable<String>(completeOnSubscribe = true).subscribe(testObserver)
-
-    testObserver.assertComplete()
-  }
-
-  @Test
   @JsName("givenJustConstructorUsed_whenSubscribing_shouldEmitTheElementAndComplete")
   fun `given just constructor used, when subscribing, should emit the element and complete`() {
-    Observable(just = "nextItem").subscribe(testObserver)
+    Single(just = "nextItem").subscribe(testObserver)
 
     testObserver.assertValues(listOf("nextItem"))
     testObserver.assertComplete()
   }
 
   @Test
-  @JsName("givenCreateWithEmitterConstructorUsed_andCompleted_whenSubscribing_shouldDispose")
-  fun `given create with emitter constructor used, when completed, should dispose`() {
+  @JsName("givenCreateWithEmitterConstructorUsed_andEmitted_whenSubscribing_shouldDispose")
+  fun `given create with emitter constructor used and emitted, when subscribing, should dispose`() {
     var didDispose = false
     val disposable = Disposables.create {
       didDispose = true
     }
-    Observable<String> { emitter ->
-      emitter.complete()
+    Single<String> { emitter ->
+      emitter.next("element")
 
       disposable
-    }
+    }.subscribe(testObserver)
 
     assertTrue(didDispose)
   }
 
   @Test
   @JsName("givenCreateWithEmitterConstructorUsed_andTerminated_whenSubscribing_shouldDispose")
-  fun `given create with emitter constructor used, when terminated, should dispose`() {
+  fun `given create with emitter constructor used and terminated, when subscribing, should dispose`() {
     var didDispose = false
     val disposable = Disposables.create {
       didDispose = true
     }
-    Observable<String> { emitter ->
+    Single<String> { emitter ->
       emitter.terminate(Throwable())
 
       disposable
-    }
+    }.subscribe(testObserver)
 
     assertTrue(didDispose)
   }

@@ -3,24 +3,17 @@ package com.noheltcj.rxcommon.observables
 import com.noheltcj.rxcommon.Source
 import com.noheltcj.rxcommon.disposables.Disposable
 import com.noheltcj.rxcommon.disposables.Disposables
-import com.noheltcj.rxcommon.emitters.ColdEmitter
-import com.noheltcj.rxcommon.emitters.Emitter
+import com.noheltcj.rxcommon.emitters.SingleEmitter
 import com.noheltcj.rxcommon.observers.Observer
 
-class Observable<E>(completeOnSubscribe: Boolean = false) : Source<E> {
+class Single<E>() : Source<E> {
   private var disposable: Disposable? = null
 
-  val emitter: Emitter<E> = ColdEmitter {
+  val emitter = SingleEmitter<E> {
     disposable?.dispose()
   }
 
-  init {
-    if (completeOnSubscribe) {
-      emitter.complete()
-    }
-  }
-
-  constructor(createWithEmitter : (Emitter<E>) -> Disposable) : this() {
+  constructor(createWithEmitter : (SingleEmitter<E>) -> Disposable) : this() {
     disposable = createWithEmitter(emitter)
     if (emitter.isDisposed) {
       disposable?.dispose()
@@ -29,7 +22,6 @@ class Observable<E>(completeOnSubscribe: Boolean = false) : Source<E> {
 
   constructor(just: E) : this() {
     emitter.next(just)
-    emitter.complete()
   }
 
   constructor(error: Throwable) : this() {

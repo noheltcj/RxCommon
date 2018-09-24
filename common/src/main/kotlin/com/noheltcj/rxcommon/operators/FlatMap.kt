@@ -13,7 +13,7 @@ class FlatMap<E, U>(
     private val upstream: Source<U>,
     private val resolveAdditionalSource: (U) -> Source<E>
 ) : Operator<E>() {
-  override val emitter: Emitter<E> = ColdEmitter()
+  override val emitter: Emitter<E> = ColdEmitter {}
 
   private var upstreamCompleted = false
   private var mergedSourceCount = 0
