@@ -9,7 +9,7 @@ import com.noheltcj.rxcommon.observers.AllObserver
 import com.noheltcj.rxcommon.observers.Observer
 
 class MapOperator<U, E>(private val upstream: Source<U>, private val transform: (U) -> E) : Operator<E>() {
-  override val emitter: Emitter<E> = ColdEmitter()
+  override val emitter: Emitter<E> = ColdEmitter {}
 
   override fun subscribe(observer: Observer<E>): Disposable {
     emitter.addObserver(observer)

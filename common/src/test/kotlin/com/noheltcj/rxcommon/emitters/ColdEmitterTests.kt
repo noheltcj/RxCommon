@@ -12,7 +12,7 @@ class ColdEmitterTests {
 
   @BeforeTest
   fun beforeEach() {
-    emitter = ColdEmitter()
+    emitter = ColdEmitter {}
     testObserver = TestObserver()
   }
 

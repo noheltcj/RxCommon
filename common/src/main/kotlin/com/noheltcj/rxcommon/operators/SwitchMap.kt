@@ -16,7 +16,7 @@ class SwitchMap<E, U>(
     private val resolveNewSource: (U) -> Source<E>
 ) : Operator<E>() {
 
-  override val emitter: Emitter<E> = ColdEmitter()
+  override val emitter: Emitter<E> = ColdEmitter {}
 
   private var currentSecondaryDisposable: Disposable? = null
   private var sourceCompleted = false
