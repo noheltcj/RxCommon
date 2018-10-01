@@ -7,6 +7,19 @@ Please refer to <https://reactivex.io> for documentation.
 While this is currently only a partial implementation, I'm doing my best 
 to follow the spec as closely as possible. 
 
+### Sources
+The reactivex documentation covers much of the functionality. If there are any significant discrepancies,
+excluding those I've illuminated within this documentation, please post an issue.
+
+* [Observable](<http://reactivex.io/documentation/observable.html>)
+* Single - Similar to observable, but will complete when the first value is emitted.
+* BehaviorRelay - [Subject](http://reactivex.io/documentation/subject.html) which ignores all notifications. Relays 
+retain and emit the latest element.
+* [BehaviorSubject](http://reactivex.io/documentation/subject.html) - Similar to the BehaviorRelay, but acknowledges
+notifications
+* [PublishSubject](http://reactivex.io/documentation/subject.html)
+* More coming, _I would gladly accept new collaborators / contributions_.
+
 ### Operators
 More operators are coming quickly, but not all have been implemented.
 
@@ -21,17 +34,17 @@ There are several places requiring imports to utilize this library.
 
 ### Common Module
 ```groovy
-implementation "com.noheltcj:rx-common:0.1.0"
+implementation "com.noheltcj:rx-common:0.2.0"
 ```
 
 ### JVM Module
 ```groovy
-implementation "com.noheltcj:rx-common-jvm:0.1.0"
+implementation "com.noheltcj:rx-common-jvm:0.2.0"
 ```
 
 ### JavaScript Module
 ```groovy
-implementation "com.noheltcj:rx-common-js:0.1.0"
+implementation "com.noheltcj:rx-common-js:0.2.0"
 ```
 
 ### Native Module

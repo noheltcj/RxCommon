@@ -35,6 +35,27 @@ class BehaviorSubjectIntegrationTests {
   }
 
   @Test
+  @JsName("givenSubscribed_whenCompleted_shouldNotify")
+  fun `given subscribed, when completed, should notify`() {
+    BehaviorSubject("hello").apply {
+      subscribe(testObserver)
+    }.onComplete()
+
+    testObserver.assertComplete()
+  }
+
+  @Test
+  @JsName("givenSubscribed_whenTerminated_shouldNotify")
+  fun `given subscribed, when terminated, should notify`() {
+    val expectedThrowable = Throwable()
+    BehaviorSubject("hello").apply {
+      subscribe(testObserver)
+    }.onError(expectedThrowable)
+
+    testObserver.assertTerminated(expectedThrowable)
+  }
+
+  @Test
   @JsName("givenNoObservers_andSubsequentElementPublished_whenSubscribing_shouldEmitTheLastValue")
   fun `given no observers and subsequent element published, when subscribing, should emit the last value`() {
     BehaviorSubject("seed").apply {
@@ -104,27 +125,6 @@ class BehaviorSubjectIntegrationTests {
     }
 
     testObserver.assertComplete()
-  }
-
-  @Test
-  @JsName("givenSubscribed_whenComplete_shouldNotify")
-  fun `given subscribed, when completed, should notify`() {
-    BehaviorSubject("hello").apply {
-      subscribe(testObserver)
-    }.onComplete()
-
-    testObserver.assertComplete()
-  }
-
-  @Test
-  @JsName("givenSubscribed_whenTerminated_shouldNotify")
-  fun `given subscribed, when terminated, should notify`() {
-    val expectedThrowable = Throwable()
-    BehaviorSubject("hello").apply {
-      subscribe(testObserver)
-    }.onError(expectedThrowable)
-
-    testObserver.assertTerminated(expectedThrowable)
   }
 
   @Test
