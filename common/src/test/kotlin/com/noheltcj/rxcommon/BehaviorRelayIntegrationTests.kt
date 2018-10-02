@@ -33,6 +33,27 @@ class BehaviorRelayIntegrationTests {
   }
 
   @Test
+  @JsName("givenSubscribed_whenTerminated_shouldNotNotify")
+  fun `given subscribed, when terminated, should not notify`() {
+    BehaviorRelay("1").apply {
+      subscribe(testObserver)
+      onError(Throwable())
+    }
+    testObserver.assertNotTerminated()
+  }
+
+  @Test
+  @JsName("givenSubscribed_whenCompleted_shouldNotNotify")
+  fun `given subscribed, when completed, should not notify`() {
+    val expectedThrowable = Throwable()
+    BehaviorRelay("1").apply {
+      subscribe(testObserver)
+      onComplete()
+    }
+    testObserver.assertNotComplete()
+  }
+
+  @Test
   @JsName("givenNoObservers_andSubsequentElementPublished_whenSubscribing_shouldEmitTheLastValue")
   fun `given no observers and subsequent element published, when subscribing, should emit the last value`() {
     BehaviorRelay("seed").apply {
