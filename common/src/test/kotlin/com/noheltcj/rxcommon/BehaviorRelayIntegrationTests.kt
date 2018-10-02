@@ -42,7 +42,6 @@ class BehaviorRelayIntegrationTests {
     testObserver.assertNotTerminated()
   }
 
-
   @Test
   @JsName("givenSubscribed_whenCompleted_shouldNotNotify")
   fun `given subscribed, when completed, should not notify`() {
