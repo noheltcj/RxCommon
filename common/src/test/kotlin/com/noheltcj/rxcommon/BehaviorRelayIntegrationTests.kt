@@ -45,7 +45,6 @@ class BehaviorRelayIntegrationTests {
   @Test
   @JsName("givenSubscribed_whenCompleted_shouldNotNotify")
   fun `given subscribed, when completed, should not notify`() {
-    val expectedThrowable = Throwable()
     BehaviorRelay("1").apply {
       subscribe(testObserver)
       onComplete()
