@@ -34,17 +34,17 @@ There are several places requiring imports to utilize this library.
 
 ### Common Module
 ```groovy
-implementation "com.noheltcj:rx-common:0.2.0"
+implementation "com.noheltcj:rx-common:0.3.0"
 ```
 
 ### JVM Module
 ```groovy
-implementation "com.noheltcj:rx-common-jvm:0.2.0"
+implementation "com.noheltcj:rx-common-jvm:0.3.0"
 ```
 
 ### JavaScript Module
 ```groovy
-implementation "com.noheltcj:rx-common-js:0.2.0"
+implementation "com.noheltcj:rx-common-js:0.3.0"
 ```
 
 ### Native Module
