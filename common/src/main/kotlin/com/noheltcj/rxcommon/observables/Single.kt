@@ -9,7 +9,7 @@ import com.noheltcj.rxcommon.observers.Observer
 class Single<E>() : Source<E> {
   private var disposable: Disposable? = null
 
-  val emitter = SingleEmitter<E> {
+  private val emitter = SingleEmitter<E> {
     disposable?.dispose()
   }
 
