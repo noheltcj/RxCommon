@@ -29,6 +29,12 @@ Currently supported operators:
 
 ### Examples
 ```kotlin
+Single(just = "hello")
+  .map { "$it world" }
+  .subscribe(NextObserver { result ->
+    // result => "hello world"
+  })
+
 Observable<String>(createWithEmitter = { emitter ->
   emitter.next("we're happy")
   emitter.next("la la la")
