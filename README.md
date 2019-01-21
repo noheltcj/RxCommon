@@ -35,7 +35,8 @@ Single(just = "hello")
     // result => "hello world"
   })
 
-Observable<String>(createWithEmitter = { emitter ->
+/* Be sure to dispose when this is no longer needed to prevent leaks. */
+val disposable = Observable<String>(createWithEmitter = { emitter ->
   emitter.next("we're happy")
   emitter.next("la la la")
 
