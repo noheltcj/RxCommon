@@ -18,4 +18,5 @@ interface Source<E> {
   fun doOnNext(onNext: (E) -> Unit): Source<E> = DoOnEach(this, NextObserver(onNext))
   fun doOnComplete(onComplete: () -> Unit): Source<E> = DoOnEach(this, CompleteObserver(onComplete))
   fun doOnError(onError: (Throwable) -> Unit): Source<E> = DoOnEach(this, TerminalObserver(onError))
+  fun onErrorReturn(resolveNewSource: (Throwable) -> Source<E>) = OnErrorReturn(this, resolveNewSource)
 }
