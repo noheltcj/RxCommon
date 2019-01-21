@@ -14,7 +14,7 @@ apply plugin: 'konan'
 konanArtifacts {
     library('RxCommon', targets: ['iphone', 'iphone_sim', 'macbook', 'wasm32', 'linux', 'android_arm64', 'android_arm32']) {
         enableMultiplatform true
-        extraOpts '-module_name', ''
+        extraOpts '-module-name', ''
     }
 
     program('tests') {
