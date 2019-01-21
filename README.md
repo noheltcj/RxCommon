@@ -41,8 +41,8 @@ Observable<String>(createWithEmitter = { emitter ->
 
   Disposables.create {
     /*
-     * This block is called when this observable has delivered its final notification.
-     * Cleanup any open resources because this cold observable's emitter has been disposed.
+     * This block is called when this cold observable loses all of its observers or
+     * a notification is received. Use this to clean up any open connections, etc.
      */
   }
 }).flatMap { happyText ->
