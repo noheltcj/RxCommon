@@ -29,29 +29,23 @@ Currently supported operators:
 
 ### Examples
 ```kotlin
-Observable(just = "hello")
-  .map { "$it world" }
-  .subscribe(NextObserver {
-    println(it)
-  })
-
-Observable(createWithEmitter = { emitter -> 
-  emitter.next("we're happy")
-  emitter.next("la la la")
-  emitter.terminate(Throwable("¯\_(ツ)_/¯"))
-  return Disposable.create {
-    // Cleanup
-  }
-}).onErrorReturn { throwable ->
-  // map error to something useful or forward it down the chain
-  Single(just = "crashed 'n burning")
-}.subscribe(NextTerminalObserver({ emission ->
-  // emission => we're happy
-  // emission => la la la
-  // emission => crashed 'n burning
-}, { throwable ->
-  // No terminal notifications in this example
-})
+    Observable<String>(createWithEmitter = { emitter ->
+      emitter.next("we're happy")
+      emitter.next("la la la")
+      emitter.terminate(Throwable("¯\\_(ツ)_/¯"))
+      Disposables.create {
+        // Cleanup
+      }
+    }).onErrorReturn { throwable ->
+      // map error to something useful or forward it down the chain
+      Single(just = "crashed 'n burning")
+    }.subscribe(NextTerminalObserver({ emission ->
+      // emission => we're happy
+      // emission => la la la
+      // emission => crashed 'n burning
+    }, { throwable ->
+      // No terminal notifications in this example
+    }))
 ```
 
 ## Installing
