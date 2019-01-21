@@ -27,6 +27,33 @@ Currently supported operators:
 * [CombineLatest](http://reactivex.io/documentation/operators/combinelatest.html)
 * [OnErrorReturn](http://reactivex.io/documentation/operators/catch.html)
 
+### Examples
+```kotlin
+Observable(just = "hello")
+  .map { "$it world" }
+  .subscribe(NextObserver {
+    println(it)
+  })
+
+Observable(createWithEmitter = { emitter -> 
+  emitter.next("we're happy")
+  emitter.next("la la la")
+  emitter.terminate(Throwable("¯\_(ツ)_/¯"))
+  return Disposable.create {
+    // Cleanup
+  }
+}).onErrorReturn { throwable ->
+  // map error to something useful or forward it down the chain
+  Single(just = "crashed 'n burning")
+}.subscribe(NextTerminalObserver({ emission ->
+  // emission => we're happy
+  // emission => la la la
+  // emission => crashed 'n burning
+}, { throwable ->
+  // No terminal notifications in this example
+})
+```
+
 ## Installing
 There are several places requiring imports to utilize this library.
 
@@ -105,4 +132,4 @@ application state and logic that utilizes this library on one thread.
 This doesn't mean you can't still operate on different threads, just 
 transfer any data back to a single designated thread. I personally use the 
 existing platform specific implementations of Rx (RxSwift, RxJava, etc) 
-combined with platform scheulding (ExecutorService, DispatchQueue, etc) to do this.
+combined with platform scheduling (ExecutorService, DispatchQueue, etc) to do this.
