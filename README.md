@@ -47,10 +47,9 @@ Observable<String>(createWithEmitter = { emitter ->
   }
 }).flatMap { happyText ->
   /* Use the text to maybe fetch something from an api. */
-
-  return@flatMap Single(error = UnauthorizedException()) // Uh oh, expired access
+  return@flatMap Single<String>(error = UnauthorizedException()) // Uh oh, expired access
     .onErrorReturn { throwable ->
-      // Handle throwable, maybe check for unauthorized and recover
+      /* Handle throwable, maybe check for unauthorized and recover */
       return@onErrorReturn Single(just = "$happyText recovery")
     }
 }.subscribe(NextTerminalObserver({ emission ->
