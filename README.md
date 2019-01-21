@@ -38,19 +38,28 @@ Single(just = "hello")
 Observable<String>(createWithEmitter = { emitter ->
   emitter.next("we're happy")
   emitter.next("la la la")
-  emitter.terminate(Throwable("¯\\_(ツ)_/¯"))
+
   Disposables.create {
-    // Cleanup
+    /*
+     * This block is called when this observable has delivered its final notification.
+     * Cleanup any open resources because this cold observable's emitter has been disposed.
+     */
   }
-}).onErrorReturn { throwable ->
-  // map error to something useful or forward it down the chain
-  Single(just = "crashed 'n burning")
+}).flatMap { happyText ->
+  /* Use the text to maybe fetch something from an api. */
+
+  return@flatMap Single(error = UnauthorizedException()) // Uh oh, expired access
+    .onErrorReturn { throwable ->
+      // Handle throwable, maybe check for unauthorized and recover
+      return@onErrorReturn Single(just = "$happyText recovery")
+    }
 }.subscribe(NextTerminalObserver({ emission ->
-  // emission => we're happy
-  // emission => la la la
-  // emission => crashed 'n burning
+  /*
+   * emission => "we're happy recovery"
+   * emission => "la la la recovery"
+   */
 }, { throwable ->
-  // No terminal notifications in this example
+  /* No terminal notifications in this example */
 }))
 ```
 
