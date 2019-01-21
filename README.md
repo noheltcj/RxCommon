@@ -1,15 +1,12 @@
 # RxCommon
-A multi-platform (Native, JVM, iOS, macOS, and JS) implementation of ReactiveX.
+A multi-platform (Native, JVM, iOS, macOS, and JS) ReactiveX implementation.
 
 ## Documentation
 Please refer to <https://reactivex.io> for documentation. 
 
-While this is currently only a partial implementation, I'm doing my best 
-to follow the spec as closely as possible. 
-
 ### Sources
 The reactivex documentation covers much of the functionality. If there are any significant discrepancies,
-excluding those I've illuminated within this documentation, please post an issue.
+excluding those illuminated within this documentation, please post an issue.
 
 * [Observable](<http://reactivex.io/documentation/observable.html>)
 * Single - Similar to observable, but will complete when the first value is emitted.
@@ -28,36 +25,64 @@ Currently supported operators:
 * [FlatMap](http://reactivex.io/documentation/operators/flatmap.html)
 * SwitchMap (non-interleaving variant of [FlatMap](http://reactivex.io/documentation/operators/flatmap.html))
 * [CombineLatest](http://reactivex.io/documentation/operators/combinelatest.html)
+* [OnErrorReturn](http://reactivex.io/documentation/operators/catch.html)
+
+### Examples
+```kotlin
+Single(just = "hello")
+  .map { "$it world" }
+  .subscribe(NextObserver { result ->
+    // result => "hello world"
+  })
+
+Observable<String>(createWithEmitter = { emitter ->
+  emitter.next("we're happy")
+  emitter.next("la la la")
+  emitter.terminate(Throwable("¯\\_(ツ)_/¯"))
+  Disposables.create {
+    // Cleanup
+  }
+}).onErrorReturn { throwable ->
+  // map error to something useful or forward it down the chain
+  Single(just = "crashed 'n burning")
+}.subscribe(NextTerminalObserver({ emission ->
+  // emission => we're happy
+  // emission => la la la
+  // emission => crashed 'n burning
+}, { throwable ->
+  // No terminal notifications in this example
+}))
+```
 
 ## Installing
 There are several places requiring imports to utilize this library.
 
 ### Common Module
 ```groovy
-implementation "com.noheltcj:rx-common:0.3.0"
+implementation "com.noheltcj:rx-common:0.4.0"
 ```
 
 ### JVM Module
 ```groovy
-implementation "com.noheltcj:rx-common-jvm:0.3.0"
+implementation "com.noheltcj:rx-common-jvm:0.4.0"
 ```
 
 ### JavaScript Module
 ```groovy
-implementation "com.noheltcj:rx-common-js:0.3.0"
+implementation "com.noheltcj:rx-common-js:0.4.0"
 ```
 
 ### Native Module
 Slightly more complicated. See the [Native Distribution Limitation](#native-library-distribution)
 
 ## Temporary Limitations
-As this is a new project with only one contributor, I haven't had time 
-to implement many of the things we've come to expect from a complete Rx
-implementation.
+As this is a new project with only a couple of contributors, we haven't had time 
+to implement many of the things many have come to expect from a complete Rx
+implementation, but open up a pull request to solve any issues and we'll work through it.
 
 ### Native Library Distribution
-I haven't had time to fully work out distribution via maven central for 
-the native kotlin library in kotlin/native projects.
+Distribution via maven central for the native kotlin library in kotlin/native 
+projects hasn't been implemented yet, but you can still use this in native projects.
 
 _You can find the pre-built kotlin libraries zipped in the release tag for each
  version._
@@ -105,6 +130,6 @@ There is absolutely no thread safety or scheduling in the library yet,
 but it's on the to-do list. In the meantime, it's best to keep any 
 application state and logic that utilizes this library on one thread. 
 This doesn't mean you can't still operate on different threads, just 
-transfer any data back to the designated thread. I personally use the 
+transfer any data back to a single designated thread. I personally use the 
 existing platform specific implementations of Rx (RxSwift, RxJava, etc) 
-to do this.
+combined with platform scheduling (ExecutorService, DispatchQueue, etc) to do this.
