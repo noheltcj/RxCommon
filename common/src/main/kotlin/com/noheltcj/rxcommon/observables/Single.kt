@@ -6,7 +6,7 @@ import com.noheltcj.rxcommon.disposables.Disposables
 import com.noheltcj.rxcommon.emitters.SingleEmitter
 import com.noheltcj.rxcommon.observers.Observer
 
-class Single<E>() : Source<E> {
+open class Single<E>() : Source<E> {
   private var disposable: Disposable? = null
 
   private val emitter = SingleEmitter<E> {

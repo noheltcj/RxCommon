@@ -7,7 +7,7 @@ import com.noheltcj.rxcommon.emitters.ColdEmitter
 import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observers.Observer
 
-class Observable<E>(completeOnSubscribe: Boolean = false) : Source<E> {
+open class Observable<E>(completeOnSubscribe: Boolean = false) : Source<E> {
   private var disposable: Disposable? = null
 
   val emitter: Emitter<E> = ColdEmitter {
