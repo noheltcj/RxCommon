@@ -5,7 +5,7 @@ import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.emitters.HotEmitter
 import com.noheltcj.rxcommon.observers.Observer
 
-class BehaviorRelay<E>(seed: E) : Subject<E>() {
+open class BehaviorRelay<E>(seed: E) : Subject<E>() {
   override val emitter: Emitter<E> = HotEmitter()
 
   var value = seed

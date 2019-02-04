@@ -3,15 +3,15 @@ package com.noheltcj.rxcommon.emitters
 import com.noheltcj.rxcommon.exceptions.UndeliverableEmissionException
 import com.noheltcj.rxcommon.observers.Observer
 
-class HotEmitter<E> : Emitter<E> {
+open class HotEmitter<E> : Emitter<E> {
   private val activeObservers = mutableListOf<Observer<E>>()
 
   override var isDisposed = false
-    private set
+    protected set
   override var isCompleted = false
-    private set
+    protected set
   override var isTerminated = false
-    private set
+    protected set
 
   override fun addObserver(observer: Observer<E>) {
     if (!isDisposed)

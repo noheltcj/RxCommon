@@ -1,7 +1,7 @@
 package com.noheltcj.rxcommon.observers
 
 class CompleteObserver<E>(
-        onComplete: () -> Unit
+    onComplete: () -> Unit
 ) : AbstractObserver<E>(
-        doOnComplete = onComplete
+    doOnComplete = onComplete
 )
