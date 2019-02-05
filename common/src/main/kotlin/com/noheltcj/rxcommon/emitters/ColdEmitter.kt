@@ -4,7 +4,7 @@ import com.noheltcj.rxcommon.exceptions.UndeliverableEmissionException
 import com.noheltcj.rxcommon.observers.Observer
 
 open class ColdEmitter<E>(private val doOnDispose: () -> Unit) : Emitter<E> {
-  private val activeObservers = mutableListOf<Observer<E>>()
+  protected val activeObservers = mutableListOf<Observer<E>>()
 
   override var isDisposed = false
     protected set

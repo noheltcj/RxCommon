@@ -15,9 +15,12 @@ class CombineLatest<S1, S2, R>(
 ) : Source<R> {
   val emitter: Emitter<R> = ColdEmitter {}
 
+  @Suppress("UNCHECKED_CAST")
   override fun subscribe(observer: Observer<R>): Disposable {
     emitter.addObserver(observer)
 
+    var sourceOneEmitted = false
+    var sourceTwoEmitted = false
     var sourceOneLastElement: S1? = null
     var sourceTwoLastElement: S2? = null
 
@@ -34,8 +37,11 @@ class CombineLatest<S1, S2, R>(
     val upstreamOneDisposable = sourceOne.subscribe(
         AllObserver(
             onNext = {
+              if (sourceTwoEmitted) {
+                emitter.next(transform(it, sourceTwoLastElement as S2))
+              }
+              sourceOneEmitted = true
               sourceOneLastElement = it
-              sourceTwoLastElement?.run { emitter.next(transform(it, this)) }
             },
             onError = { emitter.terminate(it) },
             onComplete = { onSourceCompleted() }
@@ -44,8 +50,11 @@ class CombineLatest<S1, S2, R>(
     val upstreamTwoDisposable = sourceTwo.subscribe(
         AllObserver(
             onNext = {
+              if (sourceOneEmitted) {
+                emitter.next(transform(sourceOneLastElement as S1, it))
+              }
+              sourceTwoEmitted = true
               sourceTwoLastElement = it
-              sourceOneLastElement?.run { emitter.next(transform(this, it)) }
             },
             onError = { emitter.terminate(it) },
             onComplete = { onSourceCompleted() }

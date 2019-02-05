@@ -4,7 +4,7 @@ import com.noheltcj.rxcommon.exceptions.UndeliverableEmissionException
 import com.noheltcj.rxcommon.observers.Observer
 
 open class HotEmitter<E> : Emitter<E> {
-  private val activeObservers = mutableListOf<Observer<E>>()
+  protected val activeObservers = mutableListOf<Observer<E>>()
 
   override var isDisposed = false
     protected set
@@ -34,7 +34,7 @@ open class HotEmitter<E> : Emitter<E> {
     if (!isDisposed) {
       isTerminated = true
       activeObservers.forEach { it.onError(throwable) }
-      dispose()
+      isDisposed = true
     }
   }
 
@@ -42,11 +42,7 @@ open class HotEmitter<E> : Emitter<E> {
     if (!isDisposed) {
       isCompleted = true
       activeObservers.forEach { it.onComplete() }
-      dispose()
+      isDisposed = true
     }
-  }
-
-  private fun dispose() {
-    isDisposed = true
   }
 }
