@@ -49,6 +49,17 @@ class CombineLatestIntegrationTests {
   }
 
   @Test
+  @JsName("givenTwoCombinedColdSources_andBothHaveEmittedNull_whenSubscribing_shouldEmit")
+  fun `given two combined cold sources and both have emitted null, when subscribing, should emit`() {
+    val nullableCombineTestObserver = TestObserver<Pair<Any?, String?>>()
+    val combinedObs = Observable<Any?>(just = null).combineLatest(Observable<String?>(just = null))
+
+    combinedObs.subscribe(nullableCombineTestObserver)
+
+    nullableCombineTestObserver.assertValue(null to null)
+  }
+
+  @Test
   @JsName("givenSubscribedToCombinedColdSources_andBothHaveEmitted_whenOneEmitsAgain_shouldEmitTwoValues")
   fun `given subscribed to combined cold sources and both have emitted, when one emits again, should emit two values`() {
     lateinit var emitter: Emitter<String>
