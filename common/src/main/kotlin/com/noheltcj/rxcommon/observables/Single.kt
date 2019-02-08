@@ -9,22 +9,22 @@ import com.noheltcj.rxcommon.observers.Observer
 open class Single<E>() : Source<E> {
   private var disposable: Disposable? = null
 
-  private val emitter = SingleEmitter<E> {
+  protected val emitter = SingleEmitter<E> {
     disposable?.dispose()
   }
 
-  constructor(createWithEmitter : (SingleEmitter<E>) -> Disposable) : this() {
+  constructor(createWithEmitter: (SingleEmitter<E>) -> Disposable): this() {
     disposable = createWithEmitter(emitter)
     if (emitter.isDisposed) {
       disposable?.dispose()
     }
   }
 
-  constructor(just: E) : this() {
+  constructor(just: E): this() {
     emitter.next(just)
   }
 
-  constructor(error: Throwable) : this() {
+  constructor(error: Throwable): this() {
     emitter.terminate(error)
   }
 

@@ -1,6 +1,7 @@
 package com.noheltcj.rxcommon
 
 import com.noheltcj.rxcommon.disposables.Disposable
+import com.noheltcj.rxcommon.observables.Single
 import com.noheltcj.rxcommon.observers.CompleteObserver
 import com.noheltcj.rxcommon.observers.NextObserver
 import com.noheltcj.rxcommon.observers.Observer
@@ -20,4 +21,6 @@ interface Source<E> {
   fun doOnComplete(onComplete: () -> Unit): Source<E> = DoOnEach(this, CompleteObserver(onComplete))
   fun doOnError(onError: (Throwable) -> Unit): Source<E> = DoOnEach(this, TerminalObserver(onError))
   fun onErrorReturn(resolveNewSource: (Throwable) -> Source<E>) = OnErrorReturn(this, resolveNewSource)
+  fun first(): Single<E> = SingleOperator(this)
+  fun toSingle(): Single<E> = SingleOperator(this)
 }
