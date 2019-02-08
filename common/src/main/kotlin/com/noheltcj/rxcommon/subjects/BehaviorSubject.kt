@@ -12,7 +12,7 @@ open class BehaviorSubject<E>(seed: E) : Subject<E>() {
   override val emitter: Emitter<E> = HotEmitter()
 
   var value: E = seed
-    private set
+    protected set
 
   override fun subscribe(observer: Observer<E>): Disposable {
     observer.onNext(value)

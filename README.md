@@ -22,6 +22,7 @@ More operators are coming quickly, but not all have been implemented.
 
 Currently supported operators:
 * [Map](http://reactivex.io/documentation/operators/map.html)
+* [Filter](http://reactivex.io/documentation/operators/filter.html)
 * [FlatMap](http://reactivex.io/documentation/operators/flatmap.html)
 * SwitchMap (non-interleaving variant of [FlatMap](http://reactivex.io/documentation/operators/flatmap.html))
 * [CombineLatest](http://reactivex.io/documentation/operators/combinelatest.html)
@@ -68,21 +69,30 @@ There are several places requiring imports to utilize this library.
 
 ### Common Module
 ```groovy
-implementation "com.noheltcj:rx-common:0.4.2"
+implementation "com.noheltcj:rx-common:0.5.0"
 ```
 
 ### JVM Module
 ```groovy
-implementation "com.noheltcj:rx-common-jvm:0.4.2"
+implementation "com.noheltcj:rx-common-jvm:0.5.0"
 ```
 
 ### JavaScript Module
 ```groovy
-implementation "com.noheltcj:rx-common-js:0.4.2"
+implementation "com.noheltcj:rx-common-js:0.5.0"
 ```
 
 ### Native Module
 Slightly more complicated. See the [Native Distribution Limitation](#native-library-distribution)
+
+Since native modules require dependencies to be compiled with the same kotlin version,
+we will be keeping up with this support map going forward.
+
+*RxCommon to Kotlin Stdlib Version Support Map*:
+```
+0.4.2 -> 1.3.20
+0.5.0 -> 1.3.21
+```
 
 ## Temporary Limitations
 As this is a new project with only a couple of contributors, we haven't had time 

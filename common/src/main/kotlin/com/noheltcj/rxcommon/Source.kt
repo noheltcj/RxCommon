@@ -14,6 +14,7 @@ interface Source<E> {
   fun <R> map(transform: (E) -> R): Source<R> = MapOperator(this, transform)
   fun <R> flatMap(resolveAdditionalSource: (E) -> Source<R>): Source<R> = FlatMap(this, resolveAdditionalSource)
   fun <R> switchMap(resolveNewSource: (E) -> Source<R>): Source<R> = SwitchMap(this, resolveNewSource)
+  fun filter(keep: (E) -> Boolean): Source<E> = Filter(this, keep)
   fun doOnEach(observer: Observer<E>): Source<E> = DoOnEach(this, observer)
   fun doOnNext(onNext: (E) -> Unit): Source<E> = DoOnEach(this, NextObserver(onNext))
   fun doOnComplete(onComplete: () -> Unit): Source<E> = DoOnEach(this, CompleteObserver(onComplete))

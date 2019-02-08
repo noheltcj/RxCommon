@@ -10,7 +10,7 @@ import com.noheltcj.rxcommon.observers.Observer
 open class Observable<E>(completeOnSubscribe: Boolean = false) : Source<E> {
   private var disposable: Disposable? = null
 
-  val emitter: Emitter<E> = ColdEmitter {
+  protected val emitter: Emitter<E> = ColdEmitter {
     disposable?.dispose()
   }
 

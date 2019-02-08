@@ -9,7 +9,7 @@ open class BehaviorRelay<E>(seed: E) : Subject<E>() {
   override val emitter: Emitter<E> = HotEmitter()
 
   var value = seed
-    private set
+    protected set
 
   override fun subscribe(observer: Observer<E>): Disposable {
     observer.onNext(value)
