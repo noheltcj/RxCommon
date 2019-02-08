@@ -1,6 +1,7 @@
 package com.noheltcj.rxcommon.emitters
 
 import com.noheltcj.rxcommon.exceptions.UndeliverableEmissionException
+import com.noheltcj.rxcommon.exceptions.UndeliverableNotificationException
 import com.noheltcj.rxcommon.observers.NextObserver
 import com.noheltcj.rxcommon.utility.JsName
 import com.noheltcj.rxcommon.utility.TestObserver

@@ -2,7 +2,7 @@
 A multi-platform (Native, JVM, iOS, macOS, and JS) ReactiveX implementation.
 
 ## Documentation
-Please refer to <https://reactivex.io> for documentation. 
+Please refer to <https://reactivex.io> for documentation.
 
 ### Sources
 The reactivex documentation covers much of the functionality. If there are any significant discrepancies,
@@ -21,12 +21,14 @@ notifications
 More operators are coming quickly, but not all have been implemented.
 
 Currently supported operators:
-* [Map](http://reactivex.io/documentation/operators/map.html)
-* [Filter](http://reactivex.io/documentation/operators/filter.html)
-* [FlatMap](http://reactivex.io/documentation/operators/flatmap.html)
-* SwitchMap (non-interleaving variant of [FlatMap](http://reactivex.io/documentation/operators/flatmap.html))
-* [CombineLatest](http://reactivex.io/documentation/operators/combinelatest.html)
-* [OnErrorReturn](http://reactivex.io/documentation/operators/catch.html)
+* [map](http://reactivex.io/documentation/operators/map.html)
+* [filter](http://reactivex.io/documentation/operators/filter.html)
+* [flatMap](http://reactivex.io/documentation/operators/flatmap.html)
+* switchMap (non-interleaving variant of [FlatMap](http://reactivex.io/documentation/operators/flatmap.html))
+* [combineLatest](http://reactivex.io/documentation/operators/combinelatest.html)
+* [onErrorReturn](http://reactivex.io/documentation/operators/catch.html)
+* [toSingle](http://reactivex.io/documentation/operators/first.html)
+* [first](http://reactivex.io/documentation/operators/first.html)
 
 ### Examples
 ```kotlin
@@ -88,7 +90,7 @@ Slightly more complicated. See the [Native Distribution Limitation](#native-libr
 Since native modules require dependencies to be compiled with the same kotlin version,
 we will be keeping up with this support map going forward.
 
-*RxCommon to Kotlin Stdlib Version Support Map*:
+**RxCommon to Kotlin Stdlib Version Support Map**:
 ```
 0.4.2 -> 1.3.20
 0.5.0 -> 1.3.21
