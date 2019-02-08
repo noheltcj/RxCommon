@@ -1,5 +1,5 @@
 plugins {
-    id 'kotlin-platform-common' version '1.3.20'
+    id 'kotlin-platform-common' version '1.3.21'
 }
 
 group = project_group_id
