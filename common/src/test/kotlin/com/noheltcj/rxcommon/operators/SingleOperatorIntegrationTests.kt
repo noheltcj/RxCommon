@@ -56,7 +56,7 @@ class SingleOperatorIntegrationTests {
         try {
             Observable<Int>(createWithEmitter = { emitter ->
                 emitter.next(1)
-                emitter.next( 2)
+                emitter.next(2)
                 Disposables.empty()
             })
                 .toSingle()
@@ -73,7 +73,7 @@ class SingleOperatorIntegrationTests {
         try {
             Observable<Int>(createWithEmitter = { emitter ->
                 emitter.next(1)
-                emitter.next( 2)
+                emitter.next(2)
                 Disposables.empty()
             })
                 .toSingle()
