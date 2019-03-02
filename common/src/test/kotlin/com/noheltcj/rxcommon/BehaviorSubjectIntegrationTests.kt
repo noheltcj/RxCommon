@@ -2,7 +2,6 @@ package com.noheltcj.rxcommon
 
 import com.noheltcj.rxcommon.observables.Observable
 import com.noheltcj.rxcommon.subjects.BehaviorSubject
-import com.noheltcj.rxcommon.subjects.PublishSubject
 import com.noheltcj.rxcommon.utility.JsName
 import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.BeforeTest
