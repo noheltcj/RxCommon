@@ -120,4 +120,20 @@ class BehaviorRelayIntegrationTests {
     testObserver.assertValues(listOf("hey", "hi", "still alive"))
     testObserver.assertNotDisposed()
   }
+
+  @Test
+  @JsName("givenSubscribedToColdUpstreamSource_whenSubscriptionDisposed_shouldOnlyDisposeUpstream")
+  fun `given subscribed to cold upstream source, when subscription disposed, should only dispose upstream`() {
+    val upstreamObserver = TestObserver<String>()
+    val upstream = Observable<String>()
+
+    BehaviorRelay("").apply {
+      subscribeTo(upstream).dispose()
+      subscribe(testObserver)
+    }
+
+    upstream.subscribe(upstreamObserver)
+    upstreamObserver.assertDisposed()
+    testObserver.assertNotDisposed()
+  }
 }

@@ -112,4 +112,20 @@ class PublishSubjectIntegrationTests {
 
     testObserver.assertComplete()
   }
+
+  @Test
+  @JsName("givenSubscribedToColdUpstreamSource_whenSubscriptionDisposed_shouldOnlyDisposeUpstream")
+  fun `given subscribed to cold upstream source, when subscription disposed, should only dispose upstream`() {
+    val upstreamObserver = TestObserver<String>()
+    val upstream = Observable<String>()
+
+    PublishSubject<String>().apply {
+      subscribeTo(upstream).dispose()
+      subscribe(testObserver)
+    }
+
+    upstream.subscribe(upstreamObserver)
+    upstreamObserver.assertDisposed()
+    testObserver.assertNotDisposed()
+  }
 }

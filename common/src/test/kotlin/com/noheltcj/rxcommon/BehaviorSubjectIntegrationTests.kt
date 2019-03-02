@@ -2,6 +2,7 @@ package com.noheltcj.rxcommon
 
 import com.noheltcj.rxcommon.observables.Observable
 import com.noheltcj.rxcommon.subjects.BehaviorSubject
+import com.noheltcj.rxcommon.subjects.PublishSubject
 import com.noheltcj.rxcommon.utility.JsName
 import com.noheltcj.rxcommon.utility.TestObserver
 import kotlin.test.BeforeTest
@@ -140,5 +141,21 @@ class BehaviorSubjectIntegrationTests {
     upstream.subscribe(testObserver)
 
     testObserver.assertComplete()
+  }
+
+  @Test
+  @JsName("givenSubscribedToColdUpstreamSource_whenSubscriptionDisposed_shouldOnlyDisposeUpstream")
+  fun `given subscribed to cold upstream source, when subscription disposed, should only dispose upstream`() {
+    val upstreamObserver = TestObserver<String>()
+    val upstream = Observable<String>()
+
+    BehaviorSubject("").apply {
+      subscribeTo(upstream).dispose()
+      subscribe(testObserver)
+    }
+
+    upstream.subscribe(upstreamObserver)
+    upstreamObserver.assertDisposed()
+    testObserver.assertNotDisposed()
   }
 }
