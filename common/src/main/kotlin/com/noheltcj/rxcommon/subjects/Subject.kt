@@ -34,7 +34,17 @@ abstract class Subject<E> : Observer<E>, Source<E> {
     disposeBag.dispose()
   }
 
-  open fun subscribeTo(source: Source<E>) {
-    disposeBag.add(source.subscribe(this))
+  /**
+   * Subscribes this as an observer of the specified source; forwarding emissions.
+   *
+   * @param source The source to be subscribed to.
+   * @return Created from the internal subscribe call.
+   *
+   * @see Source.subscribe
+   * @see Disposable
+   */
+  open fun subscribeTo(source: Source<E>): Disposable {
+    return source.subscribe(this)
+        .apply(disposeBag::add)
   }
 }
