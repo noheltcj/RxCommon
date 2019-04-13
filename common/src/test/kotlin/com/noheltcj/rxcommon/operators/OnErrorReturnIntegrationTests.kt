@@ -2,6 +2,7 @@ package com.noheltcj.rxcommon.operators
 
 import com.noheltcj.rxcommon.disposables.Disposables
 import com.noheltcj.rxcommon.emitters.Emitter
+import com.noheltcj.rxcommon.emitters.ObservableEmitter
 import com.noheltcj.rxcommon.observables.Observable
 import com.noheltcj.rxcommon.observables.Single
 import com.noheltcj.rxcommon.observers.NextObserver
@@ -101,7 +102,7 @@ class OnErrorReturnIntegrationTests {
   @JsName("givenOriginalSourceTerminatedWithOnError_whenResolvedSourceEmits_shouldEmit")
   fun `given original source terminated with on error, when resolved source emits, should emit`() {
     val source = PublishSubject<String>()
-    source.onErrorReturn { Single(just = "") }.subscribe(testObserver)
+    source.onErrorReturn { Single(success = "") }.subscribe(testObserver)
     source.onError(RuntimeException())
 
     testObserver.assertValue("")
@@ -131,7 +132,7 @@ class OnErrorReturnIntegrationTests {
   @Test // Test added for posterity's sake
   @JsName("givenOriginalSourceEmittedAndFlatMapped_andResolvedSourceTerminatedWithOnError_shouldNotDisposeFlatMapOrOriginalSource")
   fun `given original source emitted and flatmapped and resolved source terminated with on error, should not dispose flatmap or original source`() {
-    lateinit var emitter: Emitter<String>
+    lateinit var emitter: ObservableEmitter<String>
     val flatmapTestObserver = TestObserver<String>()
     val source = Observable<String>(createWithEmitter = {
       emitter = it
@@ -140,7 +141,7 @@ class OnErrorReturnIntegrationTests {
     source.subscribe(testObserver)
     source.flatMap {
       Observable<String>(error = RuntimeException())
-          .onErrorReturn { Single(just = "hmm") }
+          .onErrorReturn { Single(success = "hmm") }
     }.subscribe(flatmapTestObserver)
     emitter.next("yup")
 

@@ -1,11 +1,11 @@
 package com.noheltcj.rxcommon.operators
 
 import com.noheltcj.rxcommon.Source
-import com.noheltcj.rxcommon.emitters.Emitter
+import com.noheltcj.rxcommon.emitters.ObservableEmitter
 import com.noheltcj.rxcommon.observers.Observer
 
 abstract class Operator<E> : Source<E>, Observer<E> {
-  abstract val emitter: Emitter<E>
+  protected abstract val emitter: ObservableEmitter<E>
 
   override fun onNext(value: E) {
     emitter.next(value)

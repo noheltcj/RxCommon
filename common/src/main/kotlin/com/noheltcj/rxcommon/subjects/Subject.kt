@@ -4,13 +4,13 @@ import com.noheltcj.rxcommon.Source
 import com.noheltcj.rxcommon.disposables.CompositeDisposeBag
 import com.noheltcj.rxcommon.disposables.Disposable
 import com.noheltcj.rxcommon.disposables.Disposables
-import com.noheltcj.rxcommon.emitters.Emitter
+import com.noheltcj.rxcommon.emitters.HotEmitter
 import com.noheltcj.rxcommon.observers.Observer
 
 abstract class Subject<E> : Observer<E>, Source<E> {
-  protected abstract val emitter : Emitter<E>
+  protected abstract val emitter: HotEmitter<E>
 
-  private val disposeBag = CompositeDisposeBag()
+  protected val disposeBag = CompositeDisposeBag()
 
   override fun subscribe(observer: Observer<E>) : Disposable {
     emitter.addObserver(observer)

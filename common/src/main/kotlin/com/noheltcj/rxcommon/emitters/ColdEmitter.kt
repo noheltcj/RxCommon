@@ -27,11 +27,11 @@ open class ColdEmitter<E>(private val doOnDispose: () -> Unit) : Emitter<E> {
   override fun removeObserver(observer: Observer<E>) {
     activeObservers.remove(observer)
     if (activeObservers.size == 0 && !isDisposed) {
-      complete()
+      onComplete()
     }
   }
 
-  override fun next(value: E) {
+  protected fun onNext(value: E) {
     if (!isDisposed) {
       forwardPressure.add(value)
       activeObservers.forEach { it.onNext(value) }
@@ -40,7 +40,7 @@ open class ColdEmitter<E>(private val doOnDispose: () -> Unit) : Emitter<E> {
     }
   }
 
-  override fun terminate(throwable: Throwable) {
+  protected fun onTerminate(throwable: Throwable) {
     if (!isDisposed) {
       isTerminated = true
       terminalError = throwable
@@ -49,7 +49,7 @@ open class ColdEmitter<E>(private val doOnDispose: () -> Unit) : Emitter<E> {
     }
   }
 
-  override fun complete() {
+  protected fun onComplete() {
     if (!isDisposed) {
       isCompleted = true
       activeObservers.forEach { it.onComplete() }

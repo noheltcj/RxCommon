@@ -20,8 +20,8 @@ open class Single<E>() : Source<E> {
     }
   }
 
-  constructor(just: E): this() {
-    emitter.next(just)
+  constructor(success: E): this() {
+    emitter.success(success)
   }
 
   constructor(error: Throwable): this() {

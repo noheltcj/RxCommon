@@ -28,7 +28,7 @@ class SingleIntegrationTests {
   @JsName("givenCreateWithEmitterConstructorUsed_andNextEmitted_whenSubscribing_shouldEmitTheValueAndComplete")
   fun `given create with emitter constructor used, and next emitted, when subscribing, should emit the value and complete`() {
     Single<String> { emitter ->
-      emitter.next("element")
+      emitter.success("element")
 
       Disposables.empty()
     }.subscribe(testObserver)
@@ -41,7 +41,7 @@ class SingleIntegrationTests {
   @JsName("givenCreateWithEmitterConstructorUsed_andNextEmitted_whenSubscribing_shouldNotBeTerminated")
   fun `given create with emitter constructor used, and next emitted, when subscribing, should not be terminated`() {
     Single<String> { emitter ->
-      emitter.next("element")
+      emitter.success("element")
 
       Disposables.empty()
     }.subscribe(testObserver)
@@ -75,7 +75,7 @@ class SingleIntegrationTests {
   @Test
   @JsName("givenJustConstructorUsed_whenSubscribing_shouldEmitTheElementAndComplete")
   fun `given just constructor used, when subscribing, should emit the element and complete`() {
-    Single(just = "nextItem").subscribe(testObserver)
+    Single(success = "nextItem").subscribe(testObserver)
 
     testObserver.assertValues(listOf("nextItem"))
     testObserver.assertComplete()
@@ -89,7 +89,7 @@ class SingleIntegrationTests {
       didDispose = true
     }
     Single<String> { emitter ->
-      emitter.next("element")
+      emitter.success("element")
 
       disposable
     }.subscribe(testObserver)

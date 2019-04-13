@@ -2,6 +2,7 @@ package com.noheltcj.rxcommon.operators
 
 import com.noheltcj.rxcommon.disposables.Disposables
 import com.noheltcj.rxcommon.emitters.Emitter
+import com.noheltcj.rxcommon.emitters.ObservableEmitter
 import com.noheltcj.rxcommon.observables.Observable
 import com.noheltcj.rxcommon.observers.NextObserver
 import com.noheltcj.rxcommon.subjects.PublishSubject
@@ -62,7 +63,7 @@ class CombineLatestIntegrationTests {
   @Test
   @JsName("givenSubscribedToCombinedColdSources_andBothHaveEmitted_whenOneEmitsAgain_shouldEmitTwoValues")
   fun `given subscribed to combined cold sources and both have emitted, when one emits again, should emit two values`() {
-    lateinit var emitter: Emitter<String>
+    lateinit var emitter: ObservableEmitter<String>
     val stringObs = Observable<String>(createWithEmitter = {
       it.next("1")
       emitter = it
@@ -82,8 +83,8 @@ class CombineLatestIntegrationTests {
   @Test
   @JsName("givenSubscribedToCombinedColdSources_andBothHaveEmitted_whenBothEmitAgain_shouldEmitThreeValues")
   fun `given subscribed to two combined cold sources and both have emitted, when both emit again, should emit three values`() {
-    lateinit var emitterOne: Emitter<Int>
-    lateinit var emitterTwo: Emitter<String>
+    lateinit var emitterOne: ObservableEmitter<Int>
+    lateinit var emitterTwo: ObservableEmitter<String>
 
     val intObs = Observable<Int>(createWithEmitter = {
       it.next(1)

@@ -1,12 +1,11 @@
 package com.noheltcj.rxcommon.subjects
 
 import com.noheltcj.rxcommon.disposables.Disposable
-import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.emitters.HotEmitter
 import com.noheltcj.rxcommon.observers.Observer
 
 open class BehaviorRelay<E>(seed: E) : Subject<E>() {
-  override val emitter: Emitter<E> = HotEmitter()
+  override val emitter = HotEmitter<E>()
 
   var value = seed
     protected set

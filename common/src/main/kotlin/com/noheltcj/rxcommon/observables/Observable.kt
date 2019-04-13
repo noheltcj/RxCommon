@@ -3,14 +3,14 @@ package com.noheltcj.rxcommon.observables
 import com.noheltcj.rxcommon.Source
 import com.noheltcj.rxcommon.disposables.Disposable
 import com.noheltcj.rxcommon.disposables.Disposables
-import com.noheltcj.rxcommon.emitters.ColdEmitter
 import com.noheltcj.rxcommon.emitters.Emitter
+import com.noheltcj.rxcommon.emitters.ObservableEmitter
 import com.noheltcj.rxcommon.observers.Observer
 
 open class Observable<E>(completeOnSubscribe: Boolean = false) : Source<E> {
   private var disposable: Disposable? = null
 
-  protected val emitter: Emitter<E> = ColdEmitter {
+  protected val emitter = ObservableEmitter<E> {
     disposable?.dispose()
   }
 
@@ -20,7 +20,7 @@ open class Observable<E>(completeOnSubscribe: Boolean = false) : Source<E> {
     }
   }
 
-  constructor(createWithEmitter : (Emitter<E>) -> Disposable) : this() {
+  constructor(createWithEmitter : (ObservableEmitter<E>) -> Disposable) : this() {
     disposable = createWithEmitter(emitter)
     if (emitter.isDisposed) {
       disposable?.dispose()

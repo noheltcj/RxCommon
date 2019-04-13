@@ -9,8 +9,4 @@ interface Emitter<E> {
 
   fun addObserver(observer: Observer<E>)
   fun removeObserver(observer: Observer<E>)
-
-  fun next(value: E)
-  fun terminate(throwable: Throwable)
-  fun complete()
 }

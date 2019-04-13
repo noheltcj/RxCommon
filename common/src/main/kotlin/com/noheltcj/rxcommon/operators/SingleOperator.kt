@@ -12,7 +12,7 @@ internal class SingleOperator<E>(private val upstream: Source<E>) : Single<E>() 
         emitter.addObserver(observer)
 
         return upstream.subscribe(AllObserver(
-            onNext = { emitter.next(it) },
+            onNext = { emitter.success(it) },
             onError = { emitter.terminate(it) },
             onComplete = {
                 if (!emitter.isDisposed) {

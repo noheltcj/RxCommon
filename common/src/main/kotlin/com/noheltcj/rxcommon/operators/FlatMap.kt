@@ -4,8 +4,7 @@ import com.noheltcj.rxcommon.Source
 import com.noheltcj.rxcommon.disposables.CompositeDisposeBag
 import com.noheltcj.rxcommon.disposables.Disposable
 import com.noheltcj.rxcommon.disposables.Disposables
-import com.noheltcj.rxcommon.emitters.ColdEmitter
-import com.noheltcj.rxcommon.emitters.Emitter
+import com.noheltcj.rxcommon.emitters.ObservableEmitter
 import com.noheltcj.rxcommon.observers.AllObserver
 import com.noheltcj.rxcommon.observers.Observer
 
@@ -13,7 +12,7 @@ class FlatMap<E, U>(
     private val upstream: Source<U>,
     private val resolveAdditionalSource: (U) -> Source<E>
 ) : Operator<E>() {
-  override val emitter: Emitter<E> = ColdEmitter {}
+  override val emitter = ObservableEmitter<E>()
 
   private var upstreamCompleted = false
   private var mergedSourceCount = 0
