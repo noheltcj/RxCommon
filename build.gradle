@@ -17,8 +17,6 @@ plugins {
     id 'kotlin-platform-jvm' version '1.3.30' apply false
 }
 
-
-
 subprojects {
     repositories {
         jcenter()
