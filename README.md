@@ -93,7 +93,9 @@ we will be keeping up with this support map going forward.
 **RxCommon to Kotlin Stdlib Version Support Map**:
 ```
 0.4.2 -> 1.3.20
-0.5.x -> 1.3.21
+0.5.0 -> 1.3.21
+0.5.1 -> 1.3.21
+0.5.2 -> 1.3.30
 ```
 
 ## Temporary Limitations
