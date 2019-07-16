@@ -15,7 +15,7 @@ retain and emit the latest element.
 * [BehaviorSubject](http://reactivex.io/documentation/subject.html) - Similar to the BehaviorRelay, but acknowledges
 notifications
 * [PublishSubject](http://reactivex.io/documentation/subject.html)
-* More coming, _I would gladly accept new collaborators / contributions_.
+* More coming, _New collaborators / contributions are welcomed_.
 
 ### Operators
 More operators are coming quickly, but not all have been implemented.
@@ -69,19 +69,21 @@ val disposable = Observable<String>(createWithEmitter = { emitter ->
 ## Installing
 There are several places requiring imports to utilize this library.
 
+If using this in a native application, refer to the [Stdlib Version Support Map](#native-module) for the correct version to use. It's recommended to update to the latest version of kotlin to get the latest features of RxCommon or, if you're really adamant, compile it from source (not recommended) to get the latest features on an older version of kotlin.
+
 ### Common Module
 ```groovy
-implementation "com.noheltcj:rx-common:0.5.2"
+implementation "com.noheltcj:rx-common:0.5.4"
 ```
 
 ### JVM Module
 ```groovy
-implementation "com.noheltcj:rx-common-jvm:0.5.2"
+implementation "com.noheltcj:rx-common-jvm:0.5.4"
 ```
 
 ### JavaScript Module
 ```groovy
-implementation "com.noheltcj:rx-common-js:0.5.2"
+implementation "com.noheltcj:rx-common-js:0.5.4"
 ```
 
 ### Native Module
@@ -97,6 +99,7 @@ we will be keeping up with this support map going forward.
 0.5.1 -> 1.3.21
 0.5.2 -> 1.3.30
 0.5.3 -> 1.3.31
+0.5.4 -> 1.3.40
 ```
 
 ## Temporary Limitations
