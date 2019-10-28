@@ -1,6 +1,6 @@
 rootProject.name = "RxCommon"
 rootProject.buildFileName = "build.gradle.kts"
 
-include(":library")
+include(":rxcommon-core")
 
 enableFeaturePreview("GRADLE_METADATA")
