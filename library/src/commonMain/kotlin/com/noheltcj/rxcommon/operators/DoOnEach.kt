@@ -9,15 +9,17 @@ import com.noheltcj.rxcommon.observers.AllObserver
 import com.noheltcj.rxcommon.observers.Observer
 
 class DoOnEach<E>(
-        private val upstream: Source<E>,
-        private val onEachObserver: Observer<E>
+    private val upstream: Source<E>,
+    private val onEachObserver: Observer<E>
 ) : Operator<E>() {
+
     override val emitter: Emitter<E> = ColdEmitter {}
 
     override fun subscribe(observer: Observer<E>): Disposable {
         emitter.addObserver(observer)
 
-        val upstreamDisposable = upstream.subscribe(AllObserver(
+        val upstreamDisposable = upstream.subscribe(
+            AllObserver(
                 onNext = {
                     onEachObserver.onNext(it)
                     emitter.next(it)
@@ -30,7 +32,8 @@ class DoOnEach<E>(
                     onEachObserver.onComplete()
                     emitter.complete()
                 }
-        ))
+            )
+        )
 
         return Disposables.create {
             emitter.removeObserver(observer)

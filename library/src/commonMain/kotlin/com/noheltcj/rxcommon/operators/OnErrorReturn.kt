@@ -12,26 +12,29 @@ class OnErrorReturn<U>(
     private val upstream: Source<U>,
     private val onErrorResolveNewSource: (Throwable) -> Source<U>
 ) : Operator<U>() {
-  override val emitter: Emitter<U> = ColdEmitter {}
 
-  override fun subscribe(observer: Observer<U>): Disposable {
-    emitter.addObserver(observer)
+    override val emitter: Emitter<U> = ColdEmitter {}
 
-    val upstreamDisposable = upstream.subscribe(AllObserver(
-        onNext = { emitter.next(it) },
-        onError = { upstreamThrowable ->
-          onErrorResolveNewSource(upstreamThrowable).subscribe(AllObserver(
-              onNext = { emitter.next(it) },
-              onError = { emitter.terminate(it) },
-              onComplete = { emitter.complete() }
-          ))
-        },
-        onComplete = { emitter.complete() }
-    ))
+    override fun subscribe(observer: Observer<U>): Disposable {
+        emitter.addObserver(observer)
 
-    return Disposables.create {
-      emitter.removeObserver(observer)
-      upstreamDisposable.dispose()
+        val upstreamDisposable = upstream.subscribe(AllObserver(
+            onNext = { emitter.next(it) },
+            onError = { upstreamThrowable ->
+                onErrorResolveNewSource(upstreamThrowable).subscribe(
+                    AllObserver(
+                        onNext = { emitter.next(it) },
+                        onError = { emitter.terminate(it) },
+                        onComplete = { emitter.complete() }
+                    )
+                )
+            },
+            onComplete = { emitter.complete() }
+        ))
+
+        return Disposables.create {
+            emitter.removeObserver(observer)
+            upstreamDisposable.dispose()
+        }
     }
-  }
 }

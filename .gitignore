@@ -4,8 +4,10 @@
 /gradle.properties
 /.idea
 .DS_Store
-/**/build
+/**/build$
 /**/out
+build
+buildSrc/build
 /captures
 /local
 *.orig

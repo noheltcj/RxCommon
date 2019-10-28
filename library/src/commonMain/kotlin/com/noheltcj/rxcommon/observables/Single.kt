@@ -7,32 +7,32 @@ import com.noheltcj.rxcommon.emitters.SingleEmitter
 import com.noheltcj.rxcommon.observers.Observer
 
 open class Single<E>() : Source<E> {
-  private var disposable: Disposable? = null
+    private var disposable: Disposable? = null
 
-  protected val emitter = SingleEmitter<E> {
-    disposable?.dispose()
-  }
-
-  constructor(createWithEmitter: (SingleEmitter<E>) -> Disposable): this() {
-    disposable = createWithEmitter(emitter)
-    if (emitter.isDisposed) {
-      disposable?.dispose()
+    protected val emitter = SingleEmitter<E> {
+        disposable?.dispose()
     }
-  }
 
-  constructor(just: E): this() {
-    emitter.next(just)
-  }
-
-  constructor(error: Throwable): this() {
-    emitter.terminate(error)
-  }
-
-  override fun subscribe(observer: Observer<E>) : Disposable {
-    emitter.addObserver(observer)
-
-    return Disposables.create {
-      emitter.removeObserver(observer)
+    constructor(createWithEmitter: (SingleEmitter<E>) -> Disposable) : this() {
+        disposable = createWithEmitter(emitter)
+        if (emitter.isDisposed) {
+            disposable?.dispose()
+        }
     }
-  }
+
+    constructor(just: E) : this() {
+        emitter.next(just)
+    }
+
+    constructor(error: Throwable) : this() {
+        emitter.terminate(error)
+    }
+
+    override fun subscribe(observer: Observer<E>): Disposable {
+        emitter.addObserver(observer)
+
+        return Disposables.create {
+            emitter.removeObserver(observer)
+        }
+    }
 }

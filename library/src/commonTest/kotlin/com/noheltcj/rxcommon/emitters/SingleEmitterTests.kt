@@ -65,7 +65,7 @@ class SingleEmitterTests {
     }
 
     assertNotNull(capturedException)
-    assertEquals(1, capturedException!!.undeliverableEmission)
+    assertEquals(1, capturedException.undeliverableEmission)
     testObserver.assertValues(emptyList())
     testObserver.assertTerminated(expectedException)
   }
@@ -84,7 +84,7 @@ class SingleEmitterTests {
     }
 
     assertNotNull(capturedException)
-    assertEquals(2, capturedException!!.undeliverableEmission)
+    assertEquals(2, capturedException.undeliverableEmission)
     testObserver.assertValue(1)
     testObserver.assertComplete()
     testObserver.assertNotTerminated()

@@ -67,25 +67,28 @@ val disposable = Observable<String>(createWithEmitter = { emitter ->
 ```
 
 ## Installing
-There are several places requiring imports to utilize this library.
+Installing has recently become significantly easier. Now it's as simple as including
 
-### Common Module
-```groovy
-implementation "com.noheltcj:rx-common:0.5.2"
+Please ensure you're using gradle 5.3+.
+
+### Common Configuration
+```kotlin 
+kotlin {
+    /* ... */
+    sourceSets {
+        /* ... */
+        val commonMain by getting {
+            /* ... */
+            dependencies {
+                /* ... */
+                api("com.noheltcj:rxcommon:1.0.0")
+            }
+        }
+    }
+}
 ```
 
-### JVM Module
-```groovy
-implementation "com.noheltcj:rx-common-jvm:0.5.2"
-```
-
-### JavaScript Module
-```groovy
-implementation "com.noheltcj:rx-common-js:0.5.2"
-```
-
-### Native Module
-Slightly more complicated. See the [Native Distribution Limitation](#native-library-distribution)
+### Native Configuration
 
 Since native modules require dependencies to be compiled with the same kotlin version,
 we will be keeping up with this support map going forward.
@@ -97,6 +100,7 @@ we will be keeping up with this support map going forward.
 0.5.1 -> 1.3.21
 0.5.2 -> 1.3.30
 0.5.3 -> 1.3.31
+1.0.0 -> 1.3.50
 ```
 
 ## Temporary Limitations

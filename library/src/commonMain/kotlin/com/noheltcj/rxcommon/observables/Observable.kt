@@ -8,39 +8,39 @@ import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observers.Observer
 
 open class Observable<E>(completeOnSubscribe: Boolean = false) : Source<E> {
-  private var disposable: Disposable? = null
+    private var disposable: Disposable? = null
 
-  protected val emitter: Emitter<E> = ColdEmitter {
-    disposable?.dispose()
-  }
-
-  init {
-    if (completeOnSubscribe) {
-      emitter.complete()
+    protected val emitter: Emitter<E> = ColdEmitter {
+        disposable?.dispose()
     }
-  }
 
-  constructor(createWithEmitter : (Emitter<E>) -> Disposable) : this() {
-    disposable = createWithEmitter(emitter)
-    if (emitter.isDisposed) {
-      disposable?.dispose()
+    init {
+        if (completeOnSubscribe) {
+            emitter.complete()
+        }
     }
-  }
 
-  constructor(just: E) : this() {
-    emitter.next(just)
-    emitter.complete()
-  }
-
-  constructor(error: Throwable) : this() {
-    emitter.terminate(error)
-  }
-
-  override fun subscribe(observer: Observer<E>) : Disposable {
-    emitter.addObserver(observer)
-
-    return Disposables.create {
-      emitter.removeObserver(observer)
+    constructor(createWithEmitter: (Emitter<E>) -> Disposable) : this() {
+        disposable = createWithEmitter(emitter)
+        if (emitter.isDisposed) {
+            disposable?.dispose()
+        }
     }
-  }
+
+    constructor(just: E) : this() {
+        emitter.next(just)
+        emitter.complete()
+    }
+
+    constructor(error: Throwable) : this() {
+        emitter.terminate(error)
+    }
+
+    override fun subscribe(observer: Observer<E>): Disposable {
+        emitter.addObserver(observer)
+
+        return Disposables.create {
+            emitter.removeObserver(observer)
+        }
+    }
 }

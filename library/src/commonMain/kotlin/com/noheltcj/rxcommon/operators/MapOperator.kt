@@ -8,21 +8,27 @@ import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observers.AllObserver
 import com.noheltcj.rxcommon.observers.Observer
 
-class MapOperator<U, E>(private val upstream: Source<U>, private val transform: (U) -> E) : Operator<E>() {
-  override val emitter: Emitter<E> = ColdEmitter {}
+class MapOperator<U, E>(
+    private val upstream: Source<U>,
+    private val transform: (U) -> E
+) : Operator<E>() {
 
-  override fun subscribe(observer: Observer<E>): Disposable {
-    emitter.addObserver(observer)
+    override val emitter: Emitter<E> = ColdEmitter {}
 
-    val upstreamDisposable = upstream.subscribe(AllObserver (
-        onNext = { emitter.next(transform(it)) },
-        onError = { emitter.terminate(it) },
-        onComplete = { emitter.complete() }
-    ))
+    override fun subscribe(observer: Observer<E>): Disposable {
+        emitter.addObserver(observer)
 
-    return Disposables.create {
-      emitter.removeObserver(observer)
-      upstreamDisposable.dispose()
+        val upstreamDisposable = upstream.subscribe(
+            AllObserver(
+                onNext = { emitter.next(transform(it)) },
+                onError = { emitter.terminate(it) },
+                onComplete = { emitter.complete() }
+            )
+        )
+
+        return Disposables.create {
+            emitter.removeObserver(observer)
+            upstreamDisposable.dispose()
+        }
     }
-  }
 }

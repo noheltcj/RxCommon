@@ -13,40 +13,40 @@ class FlatMap<E, U>(
     private val upstream: Source<U>,
     private val resolveAdditionalSource: (U) -> Source<E>
 ) : Operator<E>() {
-  override val emitter: Emitter<E> = ColdEmitter {}
+    override val emitter: Emitter<E> = ColdEmitter {}
 
-  private var upstreamCompleted = false
-  private var mergedSourceCount = 0
+    private var upstreamCompleted = false
+    private var mergedSourceCount = 0
 
-  override fun subscribe(observer: Observer<E>): Disposable {
-    emitter.addObserver(observer)
+    override fun subscribe(observer: Observer<E>): Disposable {
+        emitter.addObserver(observer)
 
-    val disposeBag = CompositeDisposeBag()
+        val disposeBag = CompositeDisposeBag()
 
-    disposeBag.add(upstream.subscribe(
-        AllObserver(
-            onNext = {
-              mergedSourceCount += 1
-              disposeBag.add(resolveAdditionalSource(it).subscribe(this))
-            },
-            onError = { emitter.terminate(it) },
-            onComplete = {
-              upstreamCompleted = true
-              if (!emitter.isDisposed && mergedSourceCount == 0) emitter.complete()
-            }
-        )
-    ))
+        disposeBag.add(upstream.subscribe(
+            AllObserver(
+                onNext = {
+                    mergedSourceCount += 1
+                    disposeBag.add(resolveAdditionalSource(it).subscribe(this))
+                },
+                onError = { emitter.terminate(it) },
+                onComplete = {
+                    upstreamCompleted = true
+                    if (!emitter.isDisposed && mergedSourceCount == 0) emitter.complete()
+                }
+            )
+        ))
 
-    return Disposables.create {
-      emitter.removeObserver(observer)
-      disposeBag.dispose()
+        return Disposables.create {
+            emitter.removeObserver(observer)
+            disposeBag.dispose()
+        }
     }
-  }
 
-  override fun onComplete() {
-    mergedSourceCount--
-    if (upstreamCompleted && mergedSourceCount == 0) {
-      super.onComplete()
+    override fun onComplete() {
+        mergedSourceCount--
+        if (upstreamCompleted && mergedSourceCount == 0) {
+            super.onComplete()
+        }
     }
-  }
 }

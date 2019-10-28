@@ -1,6 +1,12 @@
 buildscript {
     repositories {
+        google()
         jcenter()
+    }
+
+    dependencies {
+        classpath(Dependencies.kotlinGradlePlugin)
+        classpath(Dependencies.Android.gradleTools)
     }
 }
 
@@ -9,6 +15,8 @@ subprojects {
     version = Versions.rxcommon
 
     repositories {
+        google()
         jcenter()
+        mavenCentral()
     }
 }

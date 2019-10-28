@@ -13,58 +13,59 @@ class CombineLatest<S1, S2, R>(
     private val sourceTwo: Source<S2>,
     private inline val transform: (S1, S2) -> R
 ) : Source<R> {
-  val emitter: Emitter<R> = ColdEmitter {}
 
-  @Suppress("UNCHECKED_CAST")
-  override fun subscribe(observer: Observer<R>): Disposable {
-    emitter.addObserver(observer)
+    val emitter: Emitter<R> = ColdEmitter {}
 
-    var sourceOneEmitted = false
-    var sourceTwoEmitted = false
-    var sourceOneLastElement: S1? = null
-    var sourceTwoLastElement: S2? = null
+    @Suppress("UNCHECKED_CAST")
+    override fun subscribe(observer: Observer<R>): Disposable {
+        emitter.addObserver(observer)
 
-    var completedOne = false
+        var sourceOneEmitted = false
+        var sourceTwoEmitted = false
+        var sourceOneLastElement: S1? = null
+        var sourceTwoLastElement: S2? = null
 
-    fun onSourceCompleted() {
-      if (!emitter.isDisposed && completedOne) {
-        emitter.complete()
-      } else {
-        completedOne = true
-      }
-    }
+        var completedOne = false
 
-    val upstreamOneDisposable = sourceOne.subscribe(
-        AllObserver(
-            onNext = {
-              if (sourceTwoEmitted) {
-                emitter.next(transform(it, sourceTwoLastElement as S2))
-              }
-              sourceOneEmitted = true
-              sourceOneLastElement = it
-            },
-            onError = { emitter.terminate(it) },
-            onComplete = { onSourceCompleted() }
+        fun onSourceCompleted() {
+            if (!emitter.isDisposed && completedOne) {
+                emitter.complete()
+            } else {
+                completedOne = true
+            }
+        }
+
+        val upstreamOneDisposable = sourceOne.subscribe(
+            AllObserver(
+                onNext = {
+                    if (sourceTwoEmitted) {
+                        emitter.next(transform(it, sourceTwoLastElement as S2))
+                    }
+                    sourceOneEmitted = true
+                    sourceOneLastElement = it
+                },
+                onError = { emitter.terminate(it) },
+                onComplete = { onSourceCompleted() }
+            )
         )
-    )
-    val upstreamTwoDisposable = sourceTwo.subscribe(
-        AllObserver(
-            onNext = {
-              if (sourceOneEmitted) {
-                emitter.next(transform(sourceOneLastElement as S1, it))
-              }
-              sourceTwoEmitted = true
-              sourceTwoLastElement = it
-            },
-            onError = { emitter.terminate(it) },
-            onComplete = { onSourceCompleted() }
+        val upstreamTwoDisposable = sourceTwo.subscribe(
+            AllObserver(
+                onNext = {
+                    if (sourceOneEmitted) {
+                        emitter.next(transform(sourceOneLastElement as S1, it))
+                    }
+                    sourceTwoEmitted = true
+                    sourceTwoLastElement = it
+                },
+                onError = { emitter.terminate(it) },
+                onComplete = { onSourceCompleted() }
+            )
         )
-    )
 
-    return Disposables.create {
-      emitter.removeObserver(observer)
-      upstreamOneDisposable.dispose()
-      upstreamTwoDisposable.dispose()
+        return Disposables.create {
+            emitter.removeObserver(observer)
+            upstreamOneDisposable.dispose()
+            upstreamTwoDisposable.dispose()
+        }
     }
-  }
 }

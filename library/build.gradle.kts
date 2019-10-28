@@ -1,17 +1,62 @@
 plugins {
     kotlin("multiplatform")
+    id("com.android.library")
     id("maven-publish")
 }
 
+android {
+    compileSdkVersion(29)
+
+    defaultConfig {
+        minSdkVersion(18)
+        targetSdkVersion(29)
+        versionCode = 1
+        versionName = Versions.rxcommon
+    }
+
+    buildTypes {
+        getByName("debug") {
+            isMinifyEnabled = false
+            isDebuggable = true
+        }
+        getByName("release") {
+            isMinifyEnabled = false
+        }
+    }
+}
+
 kotlin {
-    jvm()
-    js {
+    val androidTarget = android {
+        publishLibraryVariants("release", "debug")
+    }
+    val jvmTarget = jvm {
+        mavenPublication {
+            // TODO: Include sources
+        }
+    }
+    val jsTarget = js {
         browser()
         nodejs()
     }
-    iosX64()
-    iosArm64()
-    iosArm32()
+    val iosX64Target = iosX64()
+    val iosArm64Target = iosArm64()
+    val iosArm32Target = iosArm32()
+
+    configure(
+        listOf(
+            metadata(),
+            androidTarget,
+            jvmTarget,
+            jsTarget,
+            iosX64Target,
+            iosArm32Target,
+            iosArm64Target
+        )
+    ) {
+        mavenPublication {
+            artifactId = "rxcommon${this.artifactId.substring(7)}"
+        }
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -35,56 +80,69 @@ kotlin {
             dependsOn(commonTest)
         }
 
-        jvm {
-            compilations["main"].defaultSourceSet {
-                dependencies {
-                    implementation(kotlin("stdlib-jdk8"))
-                }
+
+        val jvmMain by getting {
+            dependencies {
+                implementation(kotlin("stdlib-jdk8"))
             }
         }
 
-        jvm {
-            compilations["test"].defaultSourceSet {
-                dependencies {
-                    implementation(kotlin("test-junit"))
-                }
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit"))
             }
         }
 
-        js().compilations["main"].defaultSourceSet  {
+        val jsMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-js"))
             }
         }
 
-        js().compilations["test"].defaultSourceSet {
+        val jsTest by getting {
             dependencies {
                 implementation(kotlin("test-js"))
             }
         }
 
-        iosArm32().compilations["main"].defaultSourceSet {
+        val androidMain by getting {
+            dependsOn(jvmMain)
+        }
+
+        val androidTest by getting {
+            dependsOn(jvmTest)
+        }
+
+        val iosArm32Main by getting {
             dependsOn(nativeMain)
         }
 
-        iosArm32().compilations["test"].defaultSourceSet {
+        val iosArm32Test by getting {
             dependsOn(nativeTest)
         }
 
-        iosArm64().compilations["main"].defaultSourceSet {
+        val iosArm64Main by getting {
             dependsOn(nativeMain)
         }
 
-        iosArm64().compilations["test"].defaultSourceSet {
+        val iosArm64Test by getting {
             dependsOn(nativeTest)
         }
 
-        iosX64().compilations["main"].defaultSourceSet {
+        val iosX64Main by getting {
             dependsOn(nativeMain)
         }
 
-        iosX64().compilations["test"].defaultSourceSet {
+        val iosX64Test by getting {
             dependsOn(nativeTest)
+        }
+    }
+}
+
+publishing {
+    publications.withType<MavenPublication>().apply {
+        val kotlinMultiplatform by getting {
+            artifactId = "rxcommon"
         }
     }
 }
