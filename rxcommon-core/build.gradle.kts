@@ -1,7 +1,15 @@
+@file:Suppress("UnstableApiUsage")
+
+import Publishing.addRepositories
+import Publishing.mutatePomForPublishing
+import org.jetbrains.dokka.gradle.DokkaTask
+
 plugins {
     kotlin("multiplatform")
+    id("org.jetbrains.dokka")
     id("com.android.library")
     id("maven-publish")
+    signing
 }
 
 android {
@@ -25,13 +33,26 @@ android {
     }
 }
 
+val dokka by tasks.getting(DokkaTask::class) {
+    outputDirectory = "$buildDir/dokka"
+    outputFormat = "html"
+
+    multiplatform {}
+}
+
+val dokkaJar by tasks.creating(Jar::class) {
+    group = JavaBasePlugin.DOCUMENTATION_GROUP
+    archiveClassifier.set("javadoc")
+    from(dokka)
+}
+
 kotlin {
     val androidTarget = android {
         publishLibraryVariants("release", "debug")
     }
     val jvmTarget = jvm {
         mavenPublication {
-            // TODO: Include sources
+            artifact(dokkaJar)
         }
     }
     val jsTarget = js {
@@ -54,7 +75,9 @@ kotlin {
         )
     ) {
         mavenPublication {
-            artifactId = "rxcommon${this.artifactId.substring(7)}"
+            artifactId = "rxcommon${this.artifactId.substring(8)}"
+
+            mutatePomForPublishing(projectName = "RxCommon")
         }
     }
 
@@ -79,7 +102,6 @@ kotlin {
         val nativeTest by creating {
             dependsOn(commonTest)
         }
-
 
         val jvmMain by getting {
             dependencies {
@@ -139,10 +161,19 @@ kotlin {
     }
 }
 
+signing {
+    publishing.publications.forEach {
+        sign(it)
+    }
+}
+
 publishing {
+    addRepositories(project)
     publications.withType<MavenPublication>().apply {
         val kotlinMultiplatform by getting {
             artifactId = "rxcommon"
+
+            mutatePomForPublishing(projectName = "RxCommon")
         }
     }
 }

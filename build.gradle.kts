@@ -1,12 +1,13 @@
 buildscript {
     repositories {
-        google()
         jcenter()
+        google()
     }
 
     dependencies {
-        classpath(Dependencies.kotlinGradlePlugin)
-        classpath(Dependencies.Android.gradleTools)
+        classpath(Dependencies.Classpath.kotlinGradle)
+        classpath(Dependencies.Classpath.androidTools)
+        classpath(Dependencies.Classpath.dokkaPlugin)
     }
 }
 
@@ -15,8 +16,7 @@ subprojects {
     version = Versions.rxcommon
 
     repositories {
-        google()
         jcenter()
-        mavenCentral()
+        google()
     }
 }

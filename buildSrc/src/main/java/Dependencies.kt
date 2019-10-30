@@ -1,10 +1,11 @@
 object Dependencies {
-    const val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
+    object Classpath {
+        const val kotlinGradle = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
+        const val androidTools = "com.android.tools.build:gradle:${Versions.Android.gradleTools}"
+        const val dokkaPlugin = "org.jetbrains.dokka:dokka-gradle-plugin:${Versions.dokka}"
+    }
 
     object Android {
-        const val gradleTools = "com.android.tools.build:gradle:${Versions.Android.gradleTools}"
-        const val kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.kotlin}"
-
         object AndroidX {
             const val core = "androidx.core:core-ktx:${Versions.Android.AndroidX.core}"
             const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Versions.Android.AndroidX.constraintLayout}"
