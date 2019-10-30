@@ -7,6 +7,9 @@ object Properties {
 
     fun Project.requiredForReleaseProperty(name: String) =
         properties[name] as String?
-            ?: "".takeIf { !isRelease }
-            ?: throw RuntimeException("Missing property $name")
+            ?: let {
+                if (isRelease)
+                    throw RuntimeException("Missing property $name")
+                return ""
+            }
 }
