@@ -1,7 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
 import Publishing.addRepositories
-import Publishing.mutatePomForPublishing
+import Publishing.mutatePublicationPom
 import org.jetbrains.dokka.gradle.DokkaTask
 
 plugins {
@@ -77,7 +77,7 @@ kotlin {
         mavenPublication {
             artifactId = "rxcommon${this.artifactId.substring(8)}"
 
-            mutatePomForPublishing(projectName = "RxCommon")
+            mutatePublicationPom(projectName = "RxCommon")
         }
     }
 
@@ -167,7 +167,7 @@ publishing {
         val kotlinMultiplatform by getting {
             artifactId = "rxcommon"
 
-            mutatePomForPublishing(projectName = "RxCommon")
+            mutatePublicationPom(projectName = "RxCommon")
         }
     }
 }

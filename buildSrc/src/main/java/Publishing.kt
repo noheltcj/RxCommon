@@ -6,7 +6,6 @@ import org.gradle.api.publish.maven.MavenPublication
 import java.net.URI
 
 object Publishing {
-
     fun PublishingExtension.addRepositories(project: Project) {
         repositories {
             maven {
@@ -33,7 +32,7 @@ object Publishing {
         }
     }
 
-    fun MavenPublication.mutatePomForPublishing(projectName: String) {
+    fun MavenPublication.mutatePublicationPom(projectName: String) {
         pom {
             name.set(projectName)
             inceptionYear.set("2018")
