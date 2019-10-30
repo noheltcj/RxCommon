@@ -82,7 +82,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api("com.noheltcj:rxcommon:1.0.0-rc1")
+                api("com.noheltcj:rxcommon:0.6.0")
             }
         }
     }
@@ -96,7 +96,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api 'com.noheltcj:rxcommon:1.0.0-rc1'
+                api 'com.noheltcj:rxcommon:0.6.0'
             }
         }
     }
@@ -114,7 +114,7 @@ we will be keeping up with this support map going forward.
 0.5.1 -> 1.3.21
 0.5.2 -> 1.3.30
 0.5.3 -> 1.3.31
-1.0.0-rc1 -> 1.3.50
+0.6.0 -> 1.3.50
 ```
 
 ### Objective-C Generics

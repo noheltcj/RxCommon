@@ -1,5 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
+import Properties.requiredForReleaseProperty
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
@@ -13,7 +14,7 @@ object Publishing {
                 val snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
 
                 url = URI(
-                    if (System.getenv("release") == "true") {
+                    if (Properties.isRelease) {
                         releasesRepoUrl
                     } else {
                         snapshotsRepoUrl
@@ -22,10 +23,8 @@ object Publishing {
 
                 authentication {
                     credentials {
-                        username = project.properties["ossrhUsername"] as String?
-                            ?: throw RuntimeException("Missing property ossrhUsername")
-                        password = project.properties["ossrhPassword"] as String?
-                            ?: throw RuntimeException("Missing property ossrhPassword")
+                        username = project.requiredForReleaseProperty("ossrhUsername")
+                        password = project.requiredForReleaseProperty("ossrhPassword")
                     }
                 }
             }

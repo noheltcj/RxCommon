@@ -173,5 +173,7 @@ publishing {
 }
 
 signing {
-    sign(publishing.publications)
+    if (Properties.isRelease) {
+        sign(publishing.publications)
+    }
 }
