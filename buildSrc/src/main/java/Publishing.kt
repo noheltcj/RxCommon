@@ -38,8 +38,6 @@ object Publishing {
             name.set(projectName)
             inceptionYear.set("2018")
 
-            packaging = if (projectName == "android") "aar" else "jar"
-
             description.set("A multiplatform ReactiveX implementation.")
             url.set("https://github.com/noheltcj/RxCommon")
 

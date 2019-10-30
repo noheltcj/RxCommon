@@ -161,12 +161,6 @@ kotlin {
     }
 }
 
-signing {
-    publishing.publications.forEach {
-        sign(it)
-    }
-}
-
 publishing {
     addRepositories(project)
     publications.withType<MavenPublication>().apply {
@@ -176,4 +170,8 @@ publishing {
             mutatePomForPublishing(projectName = "RxCommon")
         }
     }
+}
+
+signing {
+    sign(publishing.publications)
 }
