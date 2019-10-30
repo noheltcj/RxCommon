@@ -1,5 +1,7 @@
 # RxCommon
-A multi-platform (Native, JVM, iOS, macOS, and JS) ReactiveX implementation.
+A multi-platform ReactiveX implementation targetting JVM, iOS, Android, and JS.
+
+More targets can be added upon request.
 
 ## Documentation
 Please refer to <https://reactivex.io> for documentation.
@@ -15,7 +17,7 @@ retain and emit the latest element.
 * [BehaviorSubject](http://reactivex.io/documentation/subject.html) - Similar to the BehaviorRelay, but acknowledges
 notifications
 * [PublishSubject](http://reactivex.io/documentation/subject.html)
-* More coming, _I would gladly accept new collaborators / contributions_.
+* More coming, _new collaborators / contributions are greatly appreciated_.
 
 ### Operators
 More operators are coming quickly, but not all have been implemented.
@@ -67,93 +69,72 @@ val disposable = Observable<String>(createWithEmitter = { emitter ->
 ```
 
 ## Installing
-There are several places requiring imports to utilize this library.
 
-### Common Module
-```groovy
-implementation "com.noheltcj:rx-common:0.5.2"
-```
+Please ensure you're using gradle 5.3+.
 
-### JVM Module
-```groovy
-implementation "com.noheltcj:rx-common-jvm:0.5.2"
-```
+Installing has recently become significantly easier. Now it's as simple as including
+the following:
 
-### JavaScript Module
-```groovy
-implementation "com.noheltcj:rx-common-js:0.5.2"
-```
+### Kotlin Build Script
 
-### Native Module
-Slightly more complicated. See the [Native Distribution Limitation](#native-library-distribution)
-
-Since native modules require dependencies to be compiled with the same kotlin version,
-we will be keeping up with this support map going forward.
-
-**RxCommon to Kotlin Stdlib Version Support Map**:
-```
-0.4.2 -> 1.3.20
-0.5.0 -> 1.3.21
-0.5.1 -> 1.3.21
-0.5.2 -> 1.3.30
-0.5.3 -> 1.3.31
-```
-
-## Temporary Limitations
-As this is a new project with only a couple of contributors, we haven't had time 
-to implement many of the things many have come to expect from a complete Rx
-implementation, but open up a pull request to solve any issues and we'll work through it.
-
-### Native Library Distribution
-Distribution via maven central for the native kotlin library in kotlin/native 
-projects hasn't been implemented yet, but you can still use this in native projects.
-
-_You can find the pre-built kotlin libraries zipped in the release tag for each
- version._
-
-To install this and successfully produce a framework which can be 
-distributed for use in XCode projects, you'll need to manually install
-the .klib files for your target architectures.
-
-For example, the following gradle script looks for the files in in the 
-lib directory of the kotlin/native project.
-
-```groovy
-apply plugin: 'konan'
-
-konanArtifacts {
-    framework('Example', targets: ['ios_x64', 'ios_arm64']) {
-        extraOpts '-module_name', 'EX'
-        enableMultiplatform true
-
-        target('ios_x64') {
-            libraries {
-                useRepo 'lib/ios_x64'
-                noStdLib true // Avoids linker issues
-                klib 'RxCommon'
-            }
-        }
-
-        target('ios_arm64') {
-            libraries {
-                useRepo 'lib/ios_arm64'
-                noStdLib true
-                klib 'RxCommon'
+```kotlin 
+kotlin {
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                api("com.noheltcj:rxcommon:0.6.0")
             }
         }
     }
 }
 ```
 
+### Groovy Build Script
+
+```kotlin 
+kotlin {
+    sourceSets {
+        commonMain {
+            dependencies {
+                api 'com.noheltcj:rxcommon:0.6.0'
+            }
+        }
+    }
+}
+```
+
+### Kotlin Support Map (For Native)
+
+Since native modules require dependencies to be compiled with the same kotlin version,
+we will be keeping up with this support map going forward.
+
+```
+0.4.2 -> 1.3.20
+0.5.0 -> 1.3.21
+0.5.1 -> 1.3.21
+0.5.2 -> 1.3.30
+0.5.3 -> 1.3.31
+0.6.0 -> 1.3.50
+```
+
 ### Objective-C Generics
 Objective-c only has partial generics support, so we lose a bit of 
 information when this library is imported as a framework in XCode.
 
+To help with this, when you produce an Objective-C framework, be sure to
+enable generics support.
+
+```^groovy
+components.main {
+    outputKinds("framework")
+    extraOpts "-Xobjc-generics"
+}
+```
+
 ### Concurrency
-There is absolutely no thread safety or scheduling in the library yet, 
-but it's on the to-do list. In the meantime, it's best to keep any 
-application state and logic that utilizes this library on one thread. 
-This doesn't mean you can't still operate on different threads, just 
-transfer any data back to a single designated thread. I personally use the 
-existing platform specific implementations of Rx (RxSwift, RxJava, etc) 
-combined with platform scheduling (ExecutorService, DispatchQueue, etc) to do this.
+This library doesn't support concurrency. In the majority of cases, concurrency is
+a side effect that can be handled on the platform. If you are doing anything that
+requires a significant amount of time to operate, it's important to do this work
+off the main thread (Especially if your application has a user interface). Of course
+do that using other resources such as RxSwift, RxJava, or basic platform concurrency
+frameworks, but ensure you've returned to the main thread before re-entering the common code.
