@@ -32,6 +32,10 @@ Currently supported operators:
 * [toSingle](http://reactivex.io/documentation/operators/first.html)
 * [first](http://reactivex.io/documentation/operators/first.html)
 
+### Data Binding
+For two way data binding installation/details, please refer to [the documentation](rxcommon-binding/README.md)
+
+Data binding extensions are not automatically included in the core rxcommon artifacts.
 ### Examples
 ```kotlin
 Single(just = "hello")

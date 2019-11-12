@@ -5,5 +5,6 @@ object Versions {
 
     object Android {
         const val gradleTools = "3.5.0"
+        const val architectureComponents = "2.1.0"
     }
 }

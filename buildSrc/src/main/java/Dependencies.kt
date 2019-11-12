@@ -4,4 +4,8 @@ object Dependencies {
         const val androidTools = "com.android.tools.build:gradle:${Versions.Android.gradleTools}"
         const val dokkaPlugin = "org.jetbrains.dokka:dokka-gradle-plugin:${Versions.dokka}"
     }
+
+    object Android {
+        const val liveData = "androidx.lifecycle:lifecycle-livedata:${Versions.Android.architectureComponents}"
+    }
 }
