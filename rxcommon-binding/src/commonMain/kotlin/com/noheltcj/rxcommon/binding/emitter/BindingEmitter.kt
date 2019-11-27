@@ -1,4 +1,4 @@
-package com.noheltcj.rxcommon.binding
+package com.noheltcj.rxcommon.binding.emitter
 
 import com.noheltcj.rxcommon.emitters.HotEmitter
 import com.noheltcj.rxcommon.exceptions.UndeliverableEmissionException

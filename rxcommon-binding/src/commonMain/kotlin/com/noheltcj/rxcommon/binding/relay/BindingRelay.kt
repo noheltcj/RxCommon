@@ -1,11 +1,12 @@
-package com.noheltcj.rxcommon.binding
+package com.noheltcj.rxcommon.binding.relay
 
+import com.noheltcj.rxcommon.binding.emitter.BindingEmitter
 import com.noheltcj.rxcommon.emitters.Emitter
 import com.noheltcj.rxcommon.observers.Observer
 import com.noheltcj.rxcommon.subjects.BehaviorRelay
 
 /**
- * This relay facilitates efficient two-way binding.
+ * A [BehaviorRelay]
  */
 open class BindingRelay<E>(seed: E) : BehaviorRelay<E>(seed) {
   override val emitter: Emitter<E> = BindingEmitter()

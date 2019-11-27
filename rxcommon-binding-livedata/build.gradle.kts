@@ -47,13 +47,24 @@ val dokkaJar by tasks.creating(Jar::class) {
 }
 
 kotlin {
+    val androidTarget = android {
+        publishLibraryVariants("release", "debug")
+    }
+    val jvmTarget = jvm {
+        mavenPublication {
+            artifact(dokkaJar)
+        }
+    }
+
     configure(
         listOf(
-            metadata()
+            metadata(),
+            androidTarget,
+            jvmTarget
         )
     ) {
         mavenPublication {
-            artifactId = "rxcommon-binding-${this.artifactId.substring(8)}"
+            artifactId = "rxcommon-binding-livedata${this.artifactId.substring(8)}"
 
             mutatePublicationPom(projectName = "RxCommon")
         }
@@ -62,6 +73,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(project(":rxcommon-binding"))
                 implementation(project(":rxcommon-core"))
                 implementation(kotlin("stdlib-common"))
             }
@@ -73,6 +85,29 @@ kotlin {
                 implementation(kotlin("test-annotations-common"))
             }
         }
+
+        val jvmMain by getting {
+            dependencies {
+                implementation(kotlin("stdlib-jdk8"))
+            }
+        }
+
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit"))
+            }
+        }
+
+        val androidMain by getting {
+            dependsOn(jvmMain)
+            dependencies {
+                implementation(Dependencies.Android.liveData)
+            }
+        }
+
+        val androidTest by getting {
+            dependsOn(jvmTest)
+        }
     }
 }
 
@@ -80,7 +115,7 @@ publishing {
     addRepositories(project)
     publications.withType<MavenPublication>().apply {
         val kotlinMultiplatform by getting {
-            artifactId = "rxcommon-binding"
+            artifactId = "rxcommon-binding-livedata"
 
             mutatePublicationPom(projectName = "RxCommon")
         }

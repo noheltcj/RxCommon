@@ -1,11 +1,12 @@
-package com.noheltcj.rxcommon.binding.arch
+package com.noheltcj.rxcommon.binding.livedata
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.noheltcj.rxcommon.binding.BindingRelay
 import com.noheltcj.rxcommon.binding.InlineBiDirectionalBinding
+import com.noheltcj.rxcommon.binding.relay.BindingRelay
 import com.noheltcj.rxcommon.disposables.CompositeDisposeBag
+import com.noheltcj.rxcommon.disposables.Disposables
 import com.noheltcj.rxcommon.observers.NextObserver
 import com.noheltcj.rxcommon.subjects.Subject
 
@@ -34,7 +35,7 @@ fun <E> BindingRelay<E>.toLiveData(disposeBag: CompositeDisposeBag): MutableLive
     }
 
     disposeBag.add(binding)
-    disposeBag.add(com.noheltcj.rxcommon.disposables.Disposables.create {
+    disposeBag.add(Disposables.create {
         liveData.removeObserver(observer)
     })
 

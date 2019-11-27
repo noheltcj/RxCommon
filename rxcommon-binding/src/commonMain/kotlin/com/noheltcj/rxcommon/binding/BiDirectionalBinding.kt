@@ -1,5 +1,6 @@
 package com.noheltcj.rxcommon.binding
 
+import com.noheltcj.rxcommon.binding.relay.BindingRelay
 import com.noheltcj.rxcommon.disposables.Disposable
 import com.noheltcj.rxcommon.observers.NextObserver
 

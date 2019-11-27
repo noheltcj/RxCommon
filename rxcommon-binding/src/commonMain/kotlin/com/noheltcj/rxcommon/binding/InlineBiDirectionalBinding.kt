@@ -1,5 +1,7 @@
 package com.noheltcj.rxcommon.binding
 
+import com.noheltcj.rxcommon.binding.relay.BindingRelay
+
 class InlineBiDirectionalBinding<E, U>(
     onNext: (E) -> Unit,
     relay: BindingRelay<U>,
