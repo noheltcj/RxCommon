@@ -165,7 +165,7 @@ publishing {
     addRepositories(project)
     publications.withType<MavenPublication>().apply {
         val kotlinMultiplatform by getting {
-            artifactId = "rxcommon"
+            artifactId = "rxcommon-core"
 
             mutatePublicationPom(projectName = "RxCommon")
         }

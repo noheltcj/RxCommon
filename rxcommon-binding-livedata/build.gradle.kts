@@ -46,6 +46,7 @@ val dokkaJar by tasks.creating(Jar::class) {
     from(dokka)
 }
 
+// TODO: Extract to a plugin
 kotlin {
     val androidTarget = android {
         publishLibraryVariants("release", "debug")
@@ -64,7 +65,7 @@ kotlin {
         )
     ) {
         mavenPublication {
-            artifactId = "rxcommon-binding-livedata${this.artifactId.substring(8)}"
+            artifactId = "rxcommon${this.artifactId.substring(8)}"
 
             mutatePublicationPom(projectName = "RxCommon")
         }
@@ -73,8 +74,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":rxcommon-binding"))
-                implementation(project(":rxcommon-core"))
+                implementation(Dependencies.Project.rxcommonBinding)
+                implementation(Dependencies.Project.rxcommonCore)
                 implementation(kotlin("stdlib-common"))
             }
         }

@@ -11,12 +11,13 @@ buildscript {
     }
 }
 
-subprojects {
+allprojects {
     group = "com.noheltcj"
     version = Versions.rxcommon
 
     repositories {
         jcenter()
         google()
+        mavenLocal()
     }
 }
