@@ -16,7 +16,7 @@ android {
     compileSdkVersion(29)
 
     defaultConfig {
-        minSdkVersion(18)
+        minSdkVersion(16)
         targetSdkVersion(29)
         versionCode = 1
         versionName = Versions.rxcommon
@@ -173,7 +173,7 @@ publishing {
 }
 
 signing {
-    if (Properties.isRelease) {
+    if (Publishing.shouldSign) {
         sign(publishing.publications)
     }
 }

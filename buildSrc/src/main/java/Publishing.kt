@@ -1,30 +1,28 @@
 @file:Suppress("UnstableApiUsage")
 
-import Properties.requiredForReleaseProperty
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import java.net.URI
 
 object Publishing {
+    val shouldSign get() =
+        Properties.ossrhPassword != null && Properties.ossrhUsername != null
+
     fun PublishingExtension.addRepositories(project: Project) {
         repositories {
+            val ossrhUsername = Properties.ossrhUsername ?: return@repositories
+            val ossrhPassword = Properties.ossrhPassword ?: return@repositories
+
             maven {
                 val releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-                val snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
 
-                url = URI(
-                    if (Properties.isRelease) {
-                        releasesRepoUrl
-                    } else {
-                        snapshotsRepoUrl
-                    }
-                )
+                url = URI(releasesRepoUrl)
 
                 authentication {
                     credentials {
-                        username = project.requiredForReleaseProperty("ossrhUsername")
-                        password = project.requiredForReleaseProperty("ossrhPassword")
+                        username = ossrhUsername
+                        password = ossrhPassword
                     }
                 }
             }
